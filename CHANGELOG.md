@@ -1,5 +1,11 @@
 # Changelog
 
+## v14 — Nov 23, 2026
+- Pointers sound like a producer on the phone: Claude now writes three short lines to say out loud (Disarm, Dig deeper, Close) that push for a next step, with no coverage lectures unless the prospect asked about coverage, no canned phrases, and the same compliance limits.
+- Every built-in talk track (all objections and buying signals) rewritten in the same sales voice.
+- Layout puts the line to say first in big type; "Why they're saying it", the compliance watch-out and the playbook match sit underneath in small text. The live cue card moves its background note to the bottom too.
+- Claude gets only the matching objection's guardrail plus your real replies, so it copies your voice instead of coverage notes.
+
 ## v13 — Nov 23, 2026
 - Phone-friendly: on a phone the site opens on Quick objection, and the live-call buttons are hidden there on small screens so the objection box sits at the top (Settings stays).
 - Tapping Start listening on a phone explains that live listening needs Chrome on a computer.
