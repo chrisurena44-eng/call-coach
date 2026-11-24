@@ -1,7 +1,7 @@
 const fs=require('fs');
 const html=fs.readFileSync(process.argv[2],'utf8');
 const data=html.split('<script>')[1].split('</script>')[0];
-const ctx={};new Function(data+';Object.assign(this,{PLAYBOOK,SIGNALS,CAUTIONS,CHECK});').call(ctx);
+const ctx={};new Function(data+';Object.assign(this,{PLAYBOOK,SIGNALS,CAUTIONS,AGENT_NUDGES,CHECK});').call(ctx);
 const norm=t=>' '+t.toLowerCase().replace(/[‘’]/g,"'").replace(/[^a-z0-9'$%&\s-]/g,' ').replace(/\s+/g,' ')+' ';
 const hit=(list,t)=>list.filter(c=>c.re.test(norm(t))).map(c=>c.id);
 const P=[ // [line, expected ids]
@@ -58,6 +58,10 @@ const P=[ // [line, expected ids]
 ["What would it cost if we add hired auto",['shape']],
 ["Can you bind this today",['buy']],
 ["I need to think about it and talk to my partner",['think','decider']],
+["My neighbor pays less than what you quoted me",['friendprice']],
+["How did he get a better price than me?",['friendprice']],
+["If I lock it in, how far out can I date it?",['startdate']],
+["How long is the quote good for?",['startdate']],
 ["How soon can we get this started?",['buy']],
 ["What do you need from me to get started?",['buy']],
 ["If you can beat that price we'll switch",['buy']],
@@ -80,9 +84,19 @@ const A=[
 ["Surplus lines is the same as admitted",['esame']],
 ["Your premium won't change at audit",['pricepromise']],
 ["Just say you have no employees",['misstate']],
+["She's a couple dollars less than your rate",['otherclient']],
+["He's at fifteen hundred a year",['otherclient']],
+["You're at fifteen hundred a year",[]],
 ["When does your policy renew?",[]],
+];
+const N=[
+["I'll call you back after I check with the carrier",['nextstep']],
+["Let me confirm and I'll let you know",['nextstep']],
+["Your quote expires in two days",['expiring']],
+["What does your business do?",[]],
 ];
 let fail=0;
 for(const [t,exp] of P){const got=[...hit(ctx.SIGNALS,t),...hit(ctx.PLAYBOOK,t)];const ok=exp.every(e=>got.includes(e))&&got.every(g=>exp.includes(g));if(!ok){fail++;console.log('PROSPECT MISMATCH:',JSON.stringify(t),'expected',exp,'got',got);}}
 for(const [t,exp] of A){const got=hit(ctx.CAUTIONS,t);const ok=exp.every(e=>got.includes(e))&&got.every(g=>exp.includes(g));if(!ok){fail++;console.log('AGENT MISMATCH:',JSON.stringify(t),'expected',exp,'got',got);}}
-console.log(`${P.length+A.length-fail}/${P.length+A.length} passed`);
+for(const [t,exp] of N){const got=hit(ctx.AGENT_NUDGES,t);const ok=exp.every(e=>got.includes(e))&&got.every(g=>exp.includes(g));if(!ok){fail++;console.log('NUDGE MISMATCH:',JSON.stringify(t),'expected',exp,'got',got);}}
+const total=P.length+A.length+N.length;console.log(`${total-fail}/${total} passed`);

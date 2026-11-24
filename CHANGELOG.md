@@ -1,5 +1,12 @@
 # Changelog
 
+## v6 — Nov 23, 2026
+- Reads RingCentral AI transcript downloads (the `Name | Date Time` layout).
+- Learned from a real call: new objection "My buddy pays less", new buying signal "wants to lock in a start date", new caution for sharing another client's price or policy details.
+- New coaching moments on your own lines: "Set a time before you hang up" and "Quote expiring: ask for the bind".
+- Discovery checklist adds "Bond and license requirements"; start/effective dates count toward the date item.
+- Transcript review shows buying signals and coaching moments for each call.
+
 ## v5 — Nov 23, 2026
 - Hosted on GitHub Pages; updates go live automatically.
 - Version number in the header, and a "new version is ready" bar when an update is published.

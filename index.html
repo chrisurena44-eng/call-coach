@@ -308,6 +308,12 @@ const PLAYBOOK=[
  say:'I hear you. Before we touch limits or deductibles, let\'s look at what\'s driving the price, because a cheap policy that doesn\'t respond isn\'t cheap.',
  ask:'Is your main concern the total premium, the payment schedule, or the coverage itself?',
  avoid:'Don\'t promise a lower premium, or cut coverage, before explaining the trade-off.'},
+{id:'friendprice',title:'"My buddy pays less"',
+ re:/\b(cheaper|less|lower) than (what )?(my|his|her|our) (buddy|friend|brother|cousin|neighbor|partner)\b|\b(my )?(buddy|friend|brother|cousin|neighbor)('?s)? .{0,40}\b(pays? less|cheaper|better (price|rate|deal)|lower (price|rate))\b|\bhow (did|does) (he|she|they) get\b.{0,15}\b(better|lower|cheaper)\b|\b(he|she|they) (pays?|paid|got it for|is paying) less\b/,
+ why:'Comparing to someone else\'s price. Differences usually come from a bond or fee bundled in, a different quote date, a rate update, or different limits.',
+ say:'Good question. Let me line up the quotes. Usually the difference is a bond or fee bundled in, or a newer rate, not the coverage itself.',
+ ask:'Do you have the quote number or date you were given, so I can match it exactly?',
+ avoid:'Don\'t share another client\'s premium or policy details.'},
 {id:'quote',title:'"I got a cheaper quote"',
  re:/\b(got|have|received|found) (a |another )?(cheaper|lower|better) (quote|price|number|offer)\b|\b(another|other) (carrier|company|agent|agency|broker) (came in|was|is|quoted( us)?) (lower|cheaper|less)\b|\bquote for less\b|\bbeat you by\b|\bcan you match (this|that|their)\b|\bmuch higher than\b/,
  why:'They assume the quotes cover the same thing, or want a reason to keep shopping.',
@@ -479,6 +485,12 @@ const SIGNALS=[
  say:'Good question. Let me price that so you can see both versions side by side.',
  ask:'Is that something you want in the final quote?',
  avoid:'Don\'t promise an add-on is available until the carrier confirms it.'},
+{id:'startdate',title:'Buying signal: wants to lock in a start date',
+ re:/\block (it|this|that|the price|the rate|it all) in\b|\b(longest|how far out|how far ahead|how far) (can|could) (i|we|you)\b.{0,25}\b(date|post ?-?date|set|push|hold)\b|\bdate it out\b|\bpost ?-?dat(e|ed|ing)\b|\bhow long (is|does|will) (the|this|my) (quote|price|rate) (good|valid|last|hold)\b/,
+ why:'They\'re planning when coverage starts, which means they\'ve decided. Lock it in before the quote expires.',
+ say:'Let\'s lock it in. I can bind it now with the start date you need, as long as the carrier allows a date that far out.',
+ ask:'What date does coverage need to start, and does your inspector need it in force when you submit?',
+ avoid:'Check the quote\'s expiration and the carrier\'s limit on future start dates before promising a date.'},
 {id:'buy',title:'Buying signal: move to the close',
  re:/\bhow (soon|fast|quickly) (can|could|would) (we|i|you|it|this|coverage)\b|\bwhat (do|would) you need (from (me|us)|to get (started|going))\b|\bwhat'?s the next step\b|\bnext steps?\b|\b(send|email) (me|us) (the |an? )?(application|app|apps|paperwork|docs|documents)\b|\bhow (do|would|can) (i|we) pay\b|\bwhen (would|will|can|could) (coverage|it|the policy) (start|begin|be effective)\b|\beffective date\b|\b(can|could) (we|you) (bind|start|lock) (it|this|that|coverage|in)\b|\bbind (it|this) today\b|\b(can|could) (we|you) make it effective\b|\blet'?s (do it|do this|move forward|go ahead|get (it|this) (started|going|done))\b|\bwhere do i sign\b|\bif (you|we) can (beat|match|get)\b/,
  why:'They\'re asking how, not whether. Stop selling and make the next step easy.',
@@ -518,11 +530,31 @@ const CAUTIONS=[
  why:'Surplus lines differ from admitted coverage, including no guaranty fund protection.',
  say:'Let me be precise: there are differences, including guaranty-fund protection. I\'ll walk you through the disclosures and the policy terms.',
  ask:'',avoid:'Give the state-required surplus lines disclosures.'},
+{id:'otherclient',title:'Careful: another client\'s details',
+ re:/\b(he|she|they)('?s| is| are) (literally |just |only |about )?(a|one|two|\d+|a couple( of)?) dollars? (less|more|cheaper|higher)\b|\b(he|she)('?s| is) (at |paying )?(\$?\d+|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty) (hundred|thousand|\w+ty)|\b(his|her|their) (price|premium|rate|quote|policy) (is|was)\b|\b(he|she|they) (pays?|paid|is paying|are paying)\b.{0,20}(\$|\d|hundred|thousand)/,
+ why:'Sharing what another client pays, or their policy details, can breach that client\'s privacy and your agency\'s privacy rules.',
+ say:'I can\'t share another client\'s details, but I can walk you through exactly what\'s in your quote.',
+ ask:'',avoid:'Keep each client\'s premium and policy information private, even with a referral.'},
 {id:'misstate',title:'Careful: application accuracy',
  re:/\b(put|list|write) (it|that|them|you|those guys) down as\b|\bleave (that|it|them|those) off (the )?(app|application|form)\b|\bdon'?t (mention|tell (them|the carrier|underwriting)) (about )?(that|it|the claims?)\b|\bjust say (you|there'?s|you'?ve) (have )?(no|don'?t have)\b/,
  why:'Misstating exposures, operations or losses can void coverage and creates E&O risk.',
  say:'Actually, let\'s list it exactly as it is. If the application is wrong, a claim could be denied.',
  ask:'',avoid:'Every application answer should match what the client told you.'}
+];
+
+const AGENT_NUDGES=[
+{id:'nextstep',title:'Set a time before you hang up',cool:120000,
+ re:/\b(i'?ll|i will|let me) (give you a call back|call you back|get back to you|email you|reach back out)\b|\b(i'?ll|let me) (double check|check|confirm)\b.{0,30}\b(call|get back|let you know|email)\b|\bi'?ll let you know\b/,
+ why:'You\'re ending on a callback with no set time. Lock in the next step while they\'re on the line.',
+ say:'Before we hang up: I\'ll confirm this and call you by [time] today. Will you be free then?',
+ ask:'If the number checks out, do you want me to bind it right away so the price holds?',
+ avoid:''},
+{id:'expiring',title:'Quote expiring: ask for the bind',cool:120000,
+ re:/\b(quote|price|rate|it) (expires|is good (for|until)|is only good|will be no good|runs out)\b|\bexpires in\b/,
+ why:'You just told them the quote is about to expire. That\'s the moment to ask for the decision.',
+ say:'Since this price is only good until [date], want me to lock it in today with the start date you need?',
+ ask:'Is there anything stopping us from binding it today?',
+ avoid:'Don\'t invent urgency; only mention a deadline that\'s real.'}
 ];
 
 const NUDGES={
@@ -539,10 +571,11 @@ const CHECK=[
 {id:'people',label:'Employees and subs',re:/\b(employees|staff|crew|workers|guys|subcontract|subs\b|1099|ten ninety nine|full[- ]time|part[- ]time)/},
 {id:'vehicles',label:'Vehicles and drivers',re:/\b(vehicles?|trucks?|vans?|drivers?|fleet|trailers?|company cars?|commercial auto|personal cars?)\b/},
 {id:'carrier',label:'Current carrier and premium',re:/\b(current (carrier|company|insurance|insurer|policy|premium|agent)|who (are you|is your insurance|you'?re) (insured )?with|(insured|insurance) (is )?(with|through)|paying (now|currently|right now|a year|annually)|premium is)\b/},
-{id:'xdate',label:'Renewal / expiration date',re:/\b(renew(al|s|ed)?|expir(es|ation|e)|x[- ]date|policy (period|term))\b/},
+{id:'xdate',label:'Renewal or start date',re:/\b(renew(al|s|ed)?|expir(es|ation|e)|x[- ]date|policy (period|term)|effective|start date|post ?-?dat)/},
 {id:'losses',label:'Claims and loss runs',re:/\b(claims?|loss(es)? runs?|loss history|losses|accidents?)\b/},
 {id:'contracts',label:'Contract requirements',re:/\b(contracts?|certificates?|cert|coi|additional insured|waiver|non[- ]?contributory|general contractor|gc)\b/},
 {id:'property',label:'Locations, property, equipment',re:/\b(building|location|property|lease|landlord|equipment|tools|inventory|square feet|warehouse)\b/},
+{id:'bond',label:'Bond and license requirements',re:/\b(bonds?|surety|licen[cs]e|licensing|inspector|inspection|dmv|flhsmv|sun ?biz|somebiz)\b/},
 {id:'decider',label:'Decision maker',re:/\b(decision|decide|who else|partner|sign off)\b/}
 ];
 
@@ -563,13 +596,13 @@ const DEMO=[
 ['prospect','Okay. What do you need from me to get started?']
 ];
 
-const KEYTERMS=['additional insured','waiver of subrogation','loss runs','certificate of insurance','general liability','workers comp','garagekeepers','hired and non-owned','umbrella','surplus lines','deductible','premium','renewal'];
+const KEYTERMS=['bond','Sunbiz','dealer license','effective date','garage liability','additional insured','waiver of subrogation','loss runs','certificate of insurance','general liability','workers comp','garagekeepers','hired and non-owned','umbrella','surplus lines','deductible','premium','renewal'];
 </script>
 
 <script>
 {
 const $=s=>document.querySelector(s);
-const APP_VERSION='5';
+const APP_VERSION='6';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL={me:'You',prospect:'Prospect',call:'Call'};
 const TAG={objection:'Objection',signal:'Buying signal',caution:'Careful',nudge:'Coaching'};
@@ -639,6 +672,8 @@ function parseTranscript(raw){
     if(!ln||/^WEBVTT/i.test(ln)||/^NOTE\b/.test(ln)||/^\d+$/.test(ln)||cue.test(ln)||lone.test(ln))continue;
     let m=ln.match(/^<v\s+([^>]+)>(.*)$/i);
     if(m){add(m[1].trim(),m[2].replace(/<\/v>/i,''));continue;}
+    m=ln.match(/^(.{1,70}?)\s*\|\s*(.*\d{1,2}:\d{2}.*)$/);
+    if(m&&/[a-z]/i.test(m[1])&&m[2].length<=40){add(m[1].replace(/\s+/g,' ').trim(),'');continue;}
     m=ln.match(header);
     if(m&&!/[.?!,]$/.test(m[1])&&m[1].trim().split(/\s+/).length<=5&&/[a-z]/i.test(m[1])){add(m[1].trim(),'');continue;}
     ln=ln.replace(lead,'');
@@ -657,7 +692,7 @@ function guessMe(speakers,utts){
 }
 const MISS=/\b(but|not|don'?t|can'?t|won'?t|already|too|expensive|price|cost|busy|think|later|maybe|worried|concern|problem|issue|why|happy with|no thanks|afraid|unless|honestly)\b/;
 function analyzeCall(c){
-  const r={obj:[],sig:[],cau:[],missed:[],me:0,pr:0,q:0,checks:new Set()};
+  const r={obj:[],sig:[],cau:[],nud:[],missed:[],me:0,pr:0,q:0,checks:new Set()};
   const single=c.speakers.length<2,role=u=>single?'call':(u.spk===c.me?'me':'prospect');
   const seen={};
   c.utts.forEach((u,i)=>{
@@ -670,9 +705,10 @@ function analyzeCall(c){
       for(const card of PLAYBOOK)if(matchCard(card,t)){hit=true;seen[card.id]=(seen[card.id]||0)+1;
         if(seen[card.id]<=3){const rep=[];for(let j=i+1;j<c.utts.length&&rep.length<2;j++){if(role(c.utts[j])==='me')rep.push(c.utts[j].text);else if(rep.length)break;}
           r.obj.push({card,quote:u.text,reply:clip(rep.join(' '),360)});}}
-      if(!hit&&who==='prospect'&&w>=4&&MISS.test(t)&&r.missed.length<15)r.missed.push(u.text);
+      if(!hit&&who==='prospect'&&w>=6&&MISS.test(t)&&r.missed.length<15)r.missed.push(u.text);
     }
     if(who!=='prospect')for(const card of CAUTIONS)if(matchCard(card,t))r.cau.push({card,quote:u.text});
+    if(who==='me')for(const card of AGENT_NUDGES)if(matchCard(card,t)&&!r.nud.some(x=>x.card===card))r.nud.push({card,quote:u.text});
   });
   c.r=r;return r;
 }
@@ -706,13 +742,14 @@ function renderLearn(){
     const r=c.r,tot=r.me+r.pr,pct=tot?Math.round(r.me/tot*100):0;
     const obj=r.obj.length?'<ul>'+r.obj.map(o=>'<li><b>'+esc(o.card.title)+'</b>: "'+esc(clip(o.quote,160))+'"'+(o.reply?'<br><span class="reply">You replied: "'+esc(clip(o.reply,220))+'"</span>':'')+'</li>').join('')+'</ul>':'<p class="small mute" style="margin:0">No objections recognized yet.</p>';
     const cau=r.cau.length?'<h4>Risky phrases you said</h4><ul>'+r.cau.map(o=>'<li><b>'+esc(o.card.title.replace('Careful: ',''))+'</b>: "'+esc(clip(o.quote,160))+'"</li>').join('')+'</ul>':'';
+    const nud=r.nud.length?'<h4>Coaching moments</h4><ul>'+r.nud.map(o=>'<li><b>'+esc(o.card.title)+'</b>: you said "'+esc(clip(o.quote,160))+'"<br><span class="reply">Try: '+esc(o.card.say)+'</span></li>').join('')+'</ul>':'';
     const miss=r.missed.length?'<h4>Lines the coach didn\'t recognize</h4><p class="small mute" style="margin:0">If one is an objection, trim it to the key words, pick the card it belongs to, and click Teach.</p>'+r.missed.map(m=>teachRow(ci,m,'__new')).join(''):'';
     const ai=c.ai?'<h4>Claude\'s suggestions</h4>'+(c.ai.tips&&c.ai.tips.length?'<ul>'+c.ai.tips.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+(c.ai.missed||[]).map(m=>teachRow(ci,m.phrase,PLAYBOOK.some(p=>p.id===m.card_id)?m.card_id:'__new',m.new_title)).join(''):'';
     return '<article class="lcall" data-c="'+ci+'"><h3>'+esc(c.name)+'</h3>'+
       '<div class="lrow"><label class="field"><span class="small">Which speaker is you?</span><select data-k="me">'+c.speakers.map(s=>'<option'+(s===c.me?' selected':'')+'>'+esc(s)+'</option>').join('')+'</select></label>'+
       '<label class="field"><span class="small">How did the call end?</span><select data-k="outcome">'+[['unknown','Not sure'],['won','Sold / bound'],['followup','Follow-up set'],['lost','Not sold']].map(([v,l])=>'<option value="'+v+'"'+(c.outcome===v?' selected':'')+'>'+l+'</option>').join('')+'</select></label></div>'+
       '<p class="small" style="margin:0">'+c.utts.length+' turns · '+r.obj.length+' objections · '+r.sig.length+' buying signals · you talked '+pct+'% · '+r.q+' questions · discovery '+r.checks.size+'/'+CHECK.length+'</p>'+
-      '<h4>Objections found</h4>'+obj+cau+miss+ai+
+      '<h4>Objections found</h4>'+obj+(r.sig.length?'<h4>Buying signals</h4><ul>'+r.sig.map(o=>'<li><b>'+esc(o.card.title.replace('Buying signal: ',''))+'</b>: "'+esc(clip(o.quote,160))+'"</li>').join('')+'</ul>':'')+cau+nud+miss+ai+
       '<div class="lactions"><button class="primary" data-act="save">Save replies to playbook</button>'+(aiReady()?'<button data-act="ai">Analyze with Claude</button>':'')+'<button data-act="drop">Remove</button></div></article>';
   }).join('');
   renderLib();
@@ -851,7 +888,7 @@ function analyze(who,text){
   if(ticked)renderChecklist();
   const scan=(list,kind,cls)=>{for(const card of list){const m=matchCard(card,t);if(m){marks.push({s:m[0].trim(),cls});fire(card,kind,text);}}};
   if(who!=='me'){scan(SIGNALS,'signal','s');scan(PLAYBOOK,'objection','');}
-  if(who!=='prospect')scan(CAUTIONS,'caution','c');
+  if(who!=='prospect'){scan(CAUTIONS,'caution','c');if(who==='me')scan(AGENT_NUDGES,'nudge','s');}
   return marks;
 }
 function hl(text,marks){

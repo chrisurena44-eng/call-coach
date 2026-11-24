@@ -12,7 +12,7 @@ async def main():
         await pg.goto('file://'+path)
         await pg.click('#learnBtn')
         await pg.fill('#myName','Chris Urena'); await pg.dispatch_event('#myName','change')
-        await pg.set_input_files('#lFiles',[S+'call1_headers.txt',S+'call2_colon.txt',S+'call3.srt',S+'call4.docx'])
+        await pg.set_input_files('#lFiles',[S+'call1_headers.txt',S+'call2_colon.txt',S+'call3.srt',S+'call4.docx',S+'call5_ringcentral.txt'])
         await pg.wait_for_timeout(600)
         info=await pg.evaluate("""()=>[...document.querySelectorAll('.lcall')].map(a=>({
             name:a.querySelector('h3').textContent,
@@ -22,6 +22,9 @@ async def main():
             objections:[...a.querySelectorAll('ul li b')].map(x=>x.textContent),
             missed:[...a.querySelectorAll('.teach input:first-child')].map(i=>i.value)}))""")
         for c in info: print(json.dumps(c))
+        rc=[c for c in info if c['name']=='call5_ringcentral'][0]
+        assert rc['speakers']==['Chris Urena','SAMPLE MOTORS - SPRINGFIELD XX'] and rc['me']=='Chris Urena', rc
+        print('RINGCENTRAL FORMAT OK')
         print('MSG:', await pg.text_content('#lMsg'))
         # teach a new objection from call1 missed line
         await pg.evaluate("""()=>{const row=[...document.querySelectorAll('.teach')].find(r=>r.querySelector('input').value.includes('locked into'));
