@@ -1,0 +1,20 @@
+# Changelog
+
+## v5 — Nov 23, 2026
+- Hosted on GitHub Pages; updates go live automatically.
+- Version number in the header, and a "new version is ready" bar when an update is published.
+
+## v4
+- **Learn from calls**: upload RingCentral AI transcripts (TXT, DOCX, SRT, VTT or pasted text). Finds objections and your real replies, flags risky phrases, and lists lines the coach missed.
+- Teach new phrases or new objections; saved replies show on the cue card ("Worked before" for sold calls).
+- Optional Claude analysis of each transcript; export/import the learned playbook.
+
+## v3
+- RingCentral's AI announcement is the default call disclosure (consent checkbox can be turned back on in Settings).
+
+## v2
+- RingCentral setup: share picker opens on Chrome tabs; caller-audio meter.
+- Playbook expanded with Manus research: 28 objection cards, 2 buying-signal types, 7 agent cautions.
+
+## v1
+- Live listening (Chrome speech engine or Deepgram), objection cards, buying signals, agent cautions, discovery checklist, talk-time nudges, optional Claude coach, end-of-call summary, demo and practice modes.

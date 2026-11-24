@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Call Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm cockpit for a live sales call, readable at a glance mid-sentence
+   IDEA: a broadcast prompter / cue card that whispers the next line
+   PICTURE: the live cue card itself, with the SAY line set large
+   COLOUR and TYPE: ice ground, deep ink, hot pink for objections; Space Grotesk + Inter
+   LAYOUT: control bar, cue card, transcript, discovery checklist; stacks under 760px */
+:root{color-scheme:light dark;
+  --bg:light-dark(#dff1f7,#06222e);--card:light-dark(#ffffff,#0b3243);
+  --ink:light-dark(#06222e,#e4f3f8);--mute:light-dark(#47636f,#93b3c0);--line:light-dark(#bcdbe6,#1a4c60);
+  --pink:#ff2e7e;--pinkSoft:light-dark(#ffe1ec,#4a1730);
+  --blue:light-dark(#1659c7,#7fb2ff);--blueSoft:light-dark(#e3ecff,#15305a);
+  --amber:light-dark(#a54300,#ffab6b);--amberSoft:light-dark(#fff0e1,#47280e)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;font-weight:500;letter-spacing:-.01em}
+button,select,input,textarea{font:inherit;font-size:16px;color:var(--ink)}
+button{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-weight:500}
+button:hover{border-color:var(--ink)}
+button.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button.live{background:var(--pink);border-color:var(--pink);color:#06222e}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.small{font-size:13px}.mute{color:var(--mute)}
+.bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding:14px max(3vw,14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:12px;align-items:center}
+.brand h1{margin:0;font-size:22px;line-height:1.1}
+.status{font-size:13px;color:var(--mute);display:inline-flex;align-items:center;gap:6px}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--mute)}
+.status.on{color:var(--ink)}.status.on::before{background:var(--pink);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.lvl{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--mute);margin-left:12px}
+.lvbar{width:64px;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.lvbar i{display:block;height:100%;width:0;background:var(--pink)}
+.ver{font:500 13px/1 Inter,sans-serif;color:var(--mute);vertical-align:middle;margin-left:4px}
+.upd{margin:12px max(3vw,14px) 0;padding:10px 10px 10px 16px;border-radius:12px;background:var(--blueSoft);display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.upd p{margin:0}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.timer{font:500 22px/1 "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;min-width:64px;text-align:right;white-space:nowrap}
+.notice{margin:12px max(3vw,14px) 0;padding:10px 10px 10px 16px;border-radius:12px;background:var(--amberSoft);display:flex;gap:12px;justify-content:space-between;align-items:center}
+.notice p{margin:0}
+.grid{display:grid;gap:16px;padding:16px max(3vw,14px) 32px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:760px){.grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}.cue{grid-column:1/-1}}
+@media(min-width:1180px){.grid{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.8fr);align-items:start}.cue{grid-column:auto;position:sticky;top:16px}}
+.cue,.panel{background:var(--card);border:1px solid var(--line);border-radius:18px}
+.cue{padding:clamp(18px,2.4vw,28px);transition:background .25s,border-color .25s}
+.cue[data-kind=objection]{background:var(--pinkSoft);border-color:var(--pink)}
+.cue[data-kind=signal]{background:var(--blueSoft);border-color:var(--blue)}
+.cue[data-kind=caution]{background:var(--amberSoft);border-color:var(--amber)}
+.cue.flash{animation:flash .5s ease-out}
+@keyframes flash{from{transform:scale(.985);box-shadow:0 0 0 8px var(--pinkSoft)}to{transform:none;box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.cue.flash,.status.on::before{animation:none}}
+.cue-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tag{display:inline-block;font-size:13px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--ink);color:var(--bg)}
+.cue[data-kind=objection] .tag{background:var(--pink);color:#06222e}
+.cue[data-kind=signal] .tag{background:var(--blue);color:var(--card)}
+.cue[data-kind=caution] .tag{background:var(--amber);color:var(--card)}
+.cue h2{font-size:clamp(28px,3.2vw,40px);line-height:1.05;margin:12px 0 8px;text-wrap:balance}
+.heard{font-size:14px;color:var(--mute);margin:0 0 6px}
+.why{margin:0 0 14px;color:var(--mute);max-width:70ch}
+.line{padding:12px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:58px minmax(0,1fr);gap:12px}
+.line b{font-size:13px;font-weight:600;color:var(--mute);padding-top:4px}
+.line p{margin:0}
+.line.say p{font-size:clamp(19px,1.9vw,23px);line-height:1.35;font-weight:500}
+.line.ask p{font-size:18px}
+.line.avoid b{color:var(--amber)}
+.ai{margin-top:14px;padding:14px 16px;border-radius:12px;background:var(--bg)}
+.ai-head{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.ai h3{margin:6px 0 4px;font-size:20px;line-height:1.2}
+.ai p{margin:4px 0}
+.panel{padding:18px}
+.panel h2{font-size:18px;margin:0 0 10px}
+.panel h2+.small{margin:-6px 0 10px}
+.tx{height:clamp(300px,52vh,640px);overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px}
+.empty{color:var(--mute);margin:auto;text-align:center;max-width:32ch}
+.u{display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px}
+.u .who{font-size:13px;font-weight:600;color:var(--mute);padding-top:2px}
+.u.prospect .who,.u.call .who{color:var(--pink)}
+.u p{margin:0}
+.u.interim p{color:var(--mute);font-style:italic}
+mark{background:var(--pinkSoft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:inset 0 -2px 0 var(--pink)}
+mark.c{background:var(--amberSoft);box-shadow:inset 0 -2px 0 var(--amber)}
+mark.s{background:var(--blueSoft);box-shadow:inset 0 -2px 0 var(--blue)}
+.practice{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.practice input{flex:1 1 220px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--bg)}
+.practice select{min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:0 8px}
+.consent{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:12px;background:var(--bg);margin-bottom:18px}
+.consent input{width:22px;height:22px;margin:2px 0 0;flex:none;accent-color:var(--pink)}
+.consent p{margin:4px 0 0}
+.check{list-style:none;margin:0 0 18px;padding:0;display:grid}
+.check button{width:100%;display:flex;gap:10px;align-items:center;text-align:left;border:0;background:none;padding:4px 6px;border-radius:8px;font-weight:400}
+.check button:hover{background:var(--bg)}
+.check button::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--line)}
+.check .done button::before{background:var(--ink);border-color:var(--ink);box-shadow:inset 0 0 0 3px var(--card)}
+.check .done button{color:var(--mute)}
+.check small{margin-left:auto;font-size:13px;color:var(--mute);white-space:nowrap}
+.meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:8px}
+.stat b{display:block;font:500 26px/1.1 "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--mute)}
+.ratio{height:10px;border-radius:99px;background:var(--pinkSoft);overflow:hidden;margin:4px 0}
+.ratio i{display:block;height:100%;background:var(--ink);width:0}
+.ratio-l{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-bottom:18px}
+.history{list-style:none;padding:0;margin:0;display:grid;gap:2px}
+.history button{width:100%;text-align:left;display:flex;gap:10px;align-items:center;border:0;background:none;padding:4px 6px;border-radius:8px;font-weight:400}
+.history button:hover{background:var(--bg)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--mute)}
+.dot.objection{background:var(--pink)}.dot.signal{background:var(--blue)}.dot.caution{background:var(--amber)}
+.history time{margin-left:auto;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+dialog{border:1px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);padding:0;width:min(660px,94vw);max-height:90vh}
+dialog::backdrop{background:rgb(6 34 46/.6)}
+.dlg{padding:22px;display:grid;gap:14px}
+.dlg h2{margin:0;font-size:24px}
+.dlg-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+fieldset{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:10px;margin:0}
+legend{font-weight:600;padding:0 6px}
+.field{display:grid;gap:4px}
+.field input,.field select,textarea{min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--bg);width:100%}
+.opt{display:flex;gap:10px;align-items:flex-start}
+.opt input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--pink)}
+.opt span{display:grid}
+textarea{min-height:280px;line-height:1.5;font-size:14px;resize:vertical}
+.notes{white-space:pre-wrap;background:var(--bg);border-radius:12px;padding:14px;font-size:15px;max-height:40vh;overflow:auto}
+details summary{cursor:pointer;font-weight:600}
+#learnDlg{width:min(920px,96vw)}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:18px;text-align:center;display:grid;gap:10px;justify-items:center}
+.drop.over{border-color:var(--pink);background:var(--pinkSoft)}
+.drop input[type=file]{max-width:100%}
+.lrow{display:flex;gap:10px 16px;flex-wrap:wrap;align-items:end}
+.lrow .field{flex:1 1 200px}
+.lcall{border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:10px;background:var(--bg)}
+.lcall h3{margin:0;font-size:19px}
+.lcall h4{margin:6px 0 0;font-size:15px;font-family:Inter,sans-serif;font-weight:600}
+.lcall ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.lcall li{font-size:15px}
+.reply{color:var(--mute)}
+.teach{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,210px) auto;gap:8px;align-items:center}
+.teach input,.teach select,.lrow select{min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 10px;background:var(--card);width:100%}
+.teach .newtitle{grid-column:1/-2}
+@media(max-width:600px){.teach{grid-template-columns:minmax(0,1fr)}.teach .newtitle{grid-column:auto}}
+.lactions{display:flex;gap:8px;flex-wrap:wrap}
+.lmsg{margin:0;padding:10px 14px;border-radius:10px;background:var(--blueSoft)}
+.lib{display:grid;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:99px;padding:2px 4px 2px 10px;font-size:14px;margin:2px}
+.chip button{min-height:28px;padding:0 8px;border:0;background:none}
+.line.you b{color:var(--blue)}
+details ol{margin:8px 0 0;padding-left:20px}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="brand">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="currentColor"/><path d="M11 22v-4M16 26V14M21 29V11M26 24v-8M31 21v-2" stroke="#ff2e7e" stroke-width="3" stroke-linecap="round"/></svg>
+    <div><h1>Call Coach <span class="ver" id="ver"></span></h1><span id="status" class="status">Idle</span><span class="lvl" id="lvl" hidden>Caller audio <span class="lvbar"><i id="lvlBar"></i></span></span></div>
+  </div>
+  <div class="controls">
+    <span id="timer" class="timer">0:00</span>
+    <button id="startBtn" class="primary">Start listening</button>
+    <button id="demoBtn">Run demo call</button>
+    <button id="endBtn">End &amp; summarize</button>
+    <button id="learnBtn">Learn from calls</button>
+    <button id="settingsBtn">Settings</button>
+  </div>
+</header>
+
+<div id="upd" class="upd" hidden><p>A new version of Call Coach is ready. Reload when you're between calls.</p><button id="updBtn" class="primary">Reload now</button></div>
+<div id="notice" class="notice" hidden><p id="noticeText"></p><button id="noticeX">Dismiss</button></div>
+
+<main class="grid">
+  <section class="cue" id="cue" data-kind="idle" aria-live="polite">
+    <div class="cue-top"><span class="tag" id="cueTag">Ready</span><span class="small mute" id="cueTime"></span></div>
+    <h2 id="cueTitle">Ready for your next call</h2>
+    <p class="heard" id="cueHeard"></p>
+    <p class="why" id="cueWhy"></p>
+    <div class="line say" id="lineSay"><b>Say</b><p id="cueSay"></p></div>
+    <div class="line ask" id="lineAsk"><b>Ask</b><p id="cueAsk"></p></div>
+    <div class="line you" id="lineYou"><b id="youLabel">You said</b><p id="cueYou"></p></div>
+    <div class="line avoid" id="lineAvoid"><b>Avoid</b><p id="cueAvoid"></p></div>
+    <div class="ai" id="aiBox" hidden>
+      <div class="ai-head"><b>AI coach</b><span class="small mute" id="aiState"></span><button id="aiNow">Ask AI now</button></div>
+      <h3 id="aiHead"></h3><p id="aiSay"></p><p id="aiAsk" class="mute"></p><p id="aiCaution" class="small"></p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Live transcript</h2>
+    <p class="small mute" id="txNote">Prospect lines are scanned for objections and buying signals. Your lines are checked for risky promises.</p>
+    <div class="tx" id="tx"><p class="empty" id="txEmpty">Nothing yet. Start listening, run the demo call, or type a practice line below.</p></div>
+    <form class="practice" id="practice">
+      <select id="pWho" aria-label="Who is speaking"><option value="prospect">Prospect</option><option value="me">You</option></select>
+      <input id="pText" autocomplete="off" placeholder="Practice: type what the prospect says" aria-label="Practice line">
+      <button>Add</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <p class="consent small" id="rcNote" hidden><span><b>Disclosure: handled by RingCentral</b><br><span class="mute">RingCentral's AI announcement tells the caller the call is being transcribed. You can change this in Settings.</span></span></p>
+    <label class="consent" id="consentBox"><input type="checkbox" id="consent"><span><b>Caller agreed to transcription</b><p class="small mute">"Quick heads-up: I use an AI tool that transcribes our call so I don't miss anything. Is that okay? Happy to turn it off if you'd rather."</p></span></label>
+    <h2>Discovery</h2>
+    <p class="small mute">Ticks itself when a topic comes up. Click to tick or untick.</p>
+    <ul class="check" id="checklist"></ul>
+    <h2>Call health</h2>
+    <div class="meters" id="meters"></div>
+    <div class="ratio" aria-hidden="true"><i id="ratioBar"></i></div>
+    <div class="ratio-l"><span id="ratioMe">You 0%</span><span id="ratioPr">Prospect 0%</span></div>
+    <h2>Earlier pointers</h2>
+    <ol class="history" id="history"></ol>
+  </section>
+</main>
+
+<dialog id="settings">
+  <form method="dialog" class="dlg" id="setForm">
+    <h2>Settings</h2>
+    <fieldset>
+      <legend>Listening engine</legend>
+      <label class="opt"><input type="radio" name="engine" value="chrome"><span><b>Chrome built-in (free)</b><span class="small mute">Uses Chrome's speech recognition. No account needed.</span></span></label>
+      <label class="field"><span class="small">Chrome engine listens to</span>
+        <select id="listen">
+          <option value="both">RingCentral tab (prospect) + my mic</option>
+          <option value="prospect">RingCentral tab only (prospect)</option>
+          <option value="mic">My mic only (speakerphone)</option>
+        </select></label>
+      <label class="opt"><input type="radio" name="engine" value="deepgram"><span><b>Deepgram (more accurate)</b><span class="small mute">Streams both sides to Deepgram's Nova-3 model. Needs a Deepgram API key.</span></span></label>
+      <label class="field"><span class="small">Deepgram API key</span><input type="password" id="dgKey" autocomplete="off"></label>
+    </fieldset>
+    <fieldset>
+      <legend>AI coach (optional)</legend>
+      <label class="opt"><input type="checkbox" id="aiOn"><span><b>Turn on Claude coaching</b><span class="small mute">Reads the last few minutes and suggests the next line. Uses your Anthropic API key.</span></span></label>
+      <label class="field"><span class="small">Anthropic API key</span><input type="password" id="antKey" autocomplete="off"></label>
+      <label class="field"><span class="small">Model</span><input type="text" id="model" autocomplete="off"></label>
+    </fieldset>
+    <fieldset>
+      <legend>Call disclosure</legend>
+      <label class="opt"><input type="checkbox" id="rcAnnounce"><span><b>RingCentral announces AI transcription on our calls</b><span class="small mute">Hides the consent checkbox and the reminder. Turn this off if a call won't get the announcement.</span></span></label>
+    </fieldset>
+    <label class="opt"><input type="checkbox" id="remember"><span><b>Remember keys on this computer</b><span class="small mute">Saved only in this browser. Leave off on a shared computer.</span></span></label>
+    <details open>
+      <summary>Setup with RingCentral</summary>
+      <ol class="small">
+        <li>Make your calls from the RingCentral web app at app.ringcentral.com in Chrome. This is the easiest setup.</li>
+        <li>Wear a headset so your mic only picks up you.</li>
+        <li>Open Call Coach in its own Chrome window beside RingCentral.</li>
+        <li>Click <b>Start listening</b>. Chrome asks what to share: pick the <b>RingCentral tab</b> and turn on <b>Also share tab audio</b>.</li>
+        <li>Using the RingCentral desktop app on Windows instead? Choose <b>Entire screen</b> and turn on <b>Also share system audio</b>.</li>
+        <li>On a Mac, use app.ringcentral.com in Chrome. Chrome can't reliably hear the desktop app there.</li>
+        <li>Watch the <b>Caller audio</b> bar at the top. It moves when the caller talks.</li>
+      </ol>
+    </details>
+    <div class="dlg-actions"><button value="cancel">Cancel</button><button value="save" class="primary">Save</button></div>
+  </form>
+</dialog>
+
+<dialog id="learnDlg">
+  <div class="dlg">
+    <h2>Learn from your calls</h2>
+    <p class="small mute" style="margin:0">Upload transcripts you downloaded from RingCentral AI (TXT, DOCX, SRT or VTT). For a PDF, open it, copy all the text, and paste it below. Transcripts are read here in your browser; only short snippets you save are kept.</p>
+    <div class="lrow">
+      <label class="field"><span class="small">Your name as it appears in RingCentral transcripts</span><input type="text" id="myName" autocomplete="off" placeholder="e.g. Chris Urena"></label>
+    </div>
+    <div class="drop" id="dropZone">
+      <b>Drop transcript files here</b>
+      <input type="file" id="lFiles" multiple accept=".txt,.docx,.srt,.vtt,.md,.csv,.json,text/plain">
+    </div>
+    <label class="field"><span class="small">Or paste a transcript</span><textarea id="lPaste" style="min-height:120px" placeholder="Chris Urena: Hi, this is Chris&#10;Mike Santos: We're happy with our agent..."></textarea></label>
+    <div class="lactions"><button id="lPasteBtn">Add pasted transcript</button></div>
+    <p class="lmsg" id="lMsg" hidden></p>
+    <div id="lCalls" class="lib"></div>
+    <h2 style="font-size:20px">What the coach has learned</h2>
+    <div id="lLib" class="lib"></div>
+    <div class="lactions">
+      <button id="lExport">Export playbook</button>
+      <label class="small" style="display:inline-flex;align-items:center;gap:8px">Import playbook <input type="file" id="lImport" accept=".json,application/json"></label>
+      <button id="lClear">Clear learned data</button>
+    </div>
+    <div class="dlg-actions"><button id="learnClose" class="primary">Done</button></div>
+  </div>
+</dialog>
+
+<dialog id="sumDlg">
+  <div class="dlg">
+    <h2>Call summary</h2>
+    <div class="notes" id="aiNotes" hidden></div>
+    <textarea id="sumText" readonly aria-label="Call summary"></textarea>
+    <div class="dlg-actions">
+      <button id="aiNotesBtn">Write call notes with AI</button>
+      <button id="copyBtn">Copy</button>
+      <button id="sumClose" class="primary">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* ===== Commercial P&C playbook (Claude + Manus research): objection cards, buying signals, agent cautions, discovery items =====
+   re = pattern tested against the lower-cased line with punctuation removed */
+const PLAYBOOK=[
+{id:'price',title:'Price: "It\'s too expensive"',
+ re:/\b((price|premium|rate|quote|cost|it|that|this)('?s| is| was| seems)? (way |just |a little |a bit |kind of )?too (high|much|expensive)(?! (paperwork|hassle|work|time|trouble|of a hassle))|too expensive|(so|really|very|pretty) expensive|it'?s expensive|can'?t afford|cannot afford|out of (my|our) budget|(the )?price doesn'?t work|get the (premium|price) down|more than (we|i) pay now|(premium|price|rate|renewal|bill)s? (went|go|going|have gone|has gone|keeps going|jumped|doubled)( way)? up|costs? (too much|a lot)|outrageous|kills me)\b/,
+ why:'The value isn\'t clear yet, or a renewal increase stung. Commercial increases come from rate, exposure (payroll, sales, vehicles) or losses.',
+ say:'I hear you. Before we touch limits or deductibles, let\'s look at what\'s driving the price, because a cheap policy that doesn\'t respond isn\'t cheap.',
+ ask:'Is your main concern the total premium, the payment schedule, or the coverage itself?',
+ avoid:'Don\'t promise a lower premium, or cut coverage, before explaining the trade-off.'},
+{id:'quote',title:'"I got a cheaper quote"',
+ re:/\b(got|have|received|found) (a |another )?(cheaper|lower|better) (quote|price|number|offer)\b|\b(another|other) (carrier|company|agent|agency|broker) (came in|was|is|quoted( us)?) (lower|cheaper|less)\b|\bquote for less\b|\bbeat you by\b|\bcan you match (this|that|their)\b|\bmuch higher than\b/,
+ why:'They assume the quotes cover the same thing, or want a reason to keep shopping.',
+ say:'A lower number is useful to see. If you\'re open to it, let\'s line up limits, deductibles, forms and exclusions side by side so you\'re comparing the same thing.',
+ ask:'Can you send me their declarations and endorsements?',
+ avoid:'Don\'t call their quote inadequate before reading it, and don\'t promise to match it.'},
+{id:'agent',title:'"We already have an agent"',
+ re:/\b(happy|satisfied|good|fine|comfortable) with (my|our) (current )?(agent|broker|carrier|insurance|company|guy|agency|policy)|\balready (have|got|work with) (an |a )?(agent|broker|agency)\b|\bbroker of record\b|\b(my|our) (agent|broker|guy|agency) (takes care|handles|has been)|\b(like|love|trust) (my|our) (current )?(agent|broker|agency)\b|\b(don'?t|do not) want to switch\b|\bnot looking to (change|switch)\b|\b(they'?ve|they have) always taken care of us\b|been with (them|him|her|\w+( \w+)?) (for )?(years|forever|a long time|(\w+|\d+) years)|(brother|cousin|friend|uncle|dad|father|buddy|family) (is|does|handles) (my|our) insurance|\bloyal\b/,
+ why:'Loyalty and switching friction, not a real no. Aim for a second opinion, not a switch today.',
+ say:'Understood, and I\'m not asking you to move today. Can I ask one question to see whether a quick second look is worth your time?',
+ ask:'Is there one part of your insurance you\'d like a second set of eyes on?',
+ avoid:'Don\'t criticize their agent, and don\'t suggest moving the account without the proper broker-of-record process.'},
+{id:'send',title:'"Just email me something"',
+ re:/\b(send|email|e-mail|mail) (me|us)\b(?! (the |an? )?(application|app|apps|paperwork|docs|documents|invoice|bill|contract|binder|policy|certificate))|\bput (it|that|something) in (an )?(email|writing)\b|\bjust (send|email) (it|that|something)\b|\bsend (this|it|that) over\b/,
+ why:'They may want to compare privately, or it\'s a polite way to end the call. A quote without discovery becomes a price fight.',
+ say:'Absolutely. So it\'s actually useful, what two things do you want me to call out so you can compare it accurately?',
+ ask:'When should I follow up to walk through it with you?',
+ avoid:'Don\'t present a rough indication as a bound quote, and don\'t hang up without a follow-up time.'},
+{id:'notint',title:'"Not interested / we\'re covered"',
+ re:/\b(not interested|no thanks|no thank you|(we'?re|we are|i'?m|i am) (all set|covered|taken care of|good on (insurance|that|coverage))|we (already )?have (insurance|coverage)|already (have|got) (insurance|coverage)|don'?t need (it|any|anything|insurance))\b/,
+ why:'A reflex answer, especially on cold calls. Look for one real pain point, and respect a firm no.',
+ say:'Totally fair. I\'m not calling to sell you today. I just want to know whether your coverage would hold up if a customer or a contract called on it.',
+ ask:'Before I let you go, when does your policy renew, so I check back at the right time?',
+ avoid:'If they say no again, thank them and end the call.'},
+{id:'dnc',title:'Asked not to be called',
+ re:/\b(take (me|us|my number|our number) off|do not call (list|me|us)|don'?t call (me|us|here)( again)?|stop calling|remove (me|us|my number))\b/,
+ why:'A do-not-call request. Honor it right away, even on a business call.',
+ say:'Absolutely, I\'ll take care of that right now. Sorry for the interruption, and have a good day.',
+ ask:'',
+ avoid:'Don\'t keep pitching. Add them to your internal do-not-call list right after the call.'},
+{id:'busy',title:'"Bad time / I\'m on a job"',
+ re:/\b(too busy|swamped|slammed)( right now)?\b|\bnot (a good|the right|a great) time\b|\b(bad|busy) time\b|\b(i'?m|i am) (on a job|driving|in the middle of)\b|\bonly (have|got) a (minute|second)\b|\bcan'?t (do|talk) (this|right) now\b|\bcall me (another|some other) time\b/,
+ why:'They may simply be busy. Ask for a better time instead of pushing through.',
+ say:'Fair enough. We can stop here, or set ten minutes when you\'re free. Which works better?',
+ ask:'Would tomorrow morning or afternoon be better?',
+ avoid:'Respect a request to end the call. "Not now" isn\'t permission for repeated calls.'},
+{id:'timing',title:'"Call me closer to renewal"',
+ re:/\b(call|reach out to|contact|get back to|check (back )?with) (me|us) (back )?(later|next (week|month|year)|in (a few|a couple|\w+) (weeks|months)|closer|around|after|in the (spring|summer|fall|new year))|\b(renewal|policy|it) (isn'?t|is not|doesn'?t|does not) (up |renew |expire )?(until|for)\b|\bnot up (until|for)\b|\bnot up for renewal\b|\bcloser to (the )?(renewal|expiration|that time)\b|\btoo early to shop\b|\bwe (renew|have) (in )?(\w+|\d+) months\b/,
+ why:'Their renewal date is your timeline. Carriers want commercial submissions well ahead of renewal, and waiting costs options.',
+ say:'Makes sense. A quick look now usually avoids a rushed decision at renewal. Let me get the basics so I\'m ready at the right time.',
+ ask:'What\'s the exact expiration date, and can you have your carrier send five-year loss runs?',
+ avoid:'Don\'t suggest cancelling the current policy until dates and transition steps are confirmed.'},
+{id:'think',title:'"I need to think about it"',
+ re:/\b(need|want|have|got) to think (about )?it( over)?\b|\blet me (think about it|sleep on it|look into it|mull it over)\b|\bneed (more|some) time\b|\bnot ready to (decide|commit|make a decision)\b|\bi'?ll (get back to you|let you know)\b/,
+ why:'Usually one question is still unanswered, or they\'re uncomfortable deciding on the call.',
+ say:'Of course. So I\'m actually helpful, what question would you need answered to feel good deciding either way?',
+ ask:'Would it help to go over that one part together right now?',
+ avoid:'Don\'t invent urgency about a quote expiring or a start date.'},
+{id:'decider',title:'"I need to talk to my partner"',
+ re:/\b(talk|speak|check|discuss|run (it|this|that)) (it |this |that )?(over )?(to|with|by) (my|our|the) (business )?(partner|wife|husband|spouse|accountant|cpa|cfo|bookkeeper|boss|owner|office manager|dad|father|mom|mother|brother)s?\b|\bnot (really )?(my|up to me) (decision|call)\b|\bnot up to me\b|\b(partner|owner|wife|husband|boss|accountant|cfo) (makes|handles|decides)\b|\bneed (approval|sign off)\b|\bcan'?t decide (this )?alone\b/,
+ why:'Someone else controls the budget or the decision. Bring them in rather than pushing.',
+ say:'That makes sense. What would they want to see or hear before deciding? We can set a quick call with them too.',
+ ask:'Would you like to set a short call with everyone involved?',
+ avoid:'Confirm who is authorized to give information, approve terms and request binding.'},
+{id:'small',title:'"We\'re too small to need it"',
+ re:/\b(we'?re|we are|i'?m|i am) (too small|just a small|only a small|a small (shop|business|company|outfit))\b|\b(it'?s|that'?s) not required\b|\b(don'?t|do not) (really )?need (that|this) (coverage|insurance|policy)\b|\bpay (for it |for that )?out of pocket\b|\bnot much (exposure|risk)\b|\bwe'?re just (a few|two|three) (people|guys)\b/,
+ why:'They see insurance as a big-company cost, or think small firms don\'t have big losses.',
+ say:'You may not need every option. Let\'s look at your operations and contracts first, then decide together what\'s worth quoting.',
+ ask:'What would be hardest for the business to pay for after a bad loss?',
+ avoid:'Don\'t say a coverage is legally required, or unnecessary, without checking the law, contract and facts.'},
+{id:'noclaims',title:'"We\'ve never had a claim"',
+ re:/\b(never|haven'?t|have not|hasn'?t) (ever )?(had|filed|made|used|needed) (a|any|one|it|insurance|our insurance)\b|\b(no|zero|don'?t have any) (claims|losses)\b|\bclaim[- ]free\b|\bnothing'?s (ever )?happened\b|\bwe'?ve been lucky\b|\bloss history is clean\b|\bpaying for nothing\b|\bwaste of money\b|\bnever (use|need) it\b/,
+ why:'A clean history is leverage with underwriters, not proof future coverage won\'t matter.',
+ say:'That\'s great, and we should use it. A clean history helps with underwriters. But it doesn\'t tell us what a policy would cover if something happens.',
+ ask:'Have your operations, locations, employees or contracts changed since last renewal?',
+ avoid:'Don\'t imply a clean history guarantees acceptance or a lower price.'},
+{id:'minimum',title:'"I just need the minimum"',
+ re:/\b(just|only) (need|want|looking for) (the |a )?(minimum|bare minimum|basics?|cheapest|cheapest (policy|thing|one))\b|\bstate minimum\b|\b(bare minimum|minimum coverage|cheapest (policy|option|thing|one))\b/,
+ why:'Price-first buyer. Fine, as long as lean still covers what could sink the business.',
+ say:'We can keep it lean. Let\'s just make sure lean still covers the things that could actually put you out of business.',
+ ask:'What does a typical job look like, so I know what can\'t be left out?',
+ avoid:'If they decline coverage you recommended, document it in writing.'},
+{id:'cert',title:'Certificate or contract wording',
+ re:/\b(just|only) (need|want) (a |the )?(certificate|cert|coi|proof of insurance)\b|\bcertificate is enough\b|\b(coi|certificate|cert) says (we'?re|we are) covered\b|\bonly want a coi\b|\badd (them|him|her|the gc|my gc|the landlord) (as )?(an )?additional insured\b|\bblanket additional insured\b|\bwaiver of subrogation\b|\bprimary (and )?non[- ]?contributory\b|\b30 days'? notice\b|\b(gc|general contractor|contractor|landlord|lease|contract|client|property manager) (just |only )?(needs|requires|wants|is asking for|asked for) (a |an |the )?(certificate|cert|coi|proof|additional insured|insurance)/,
+ why:'A certificate only summarizes the policy; it can\'t add coverage. The contract may require additional insured, waiver or primary wording that must be on the policy itself.',
+ say:'Happy to help. A certificate only shows what the policy already has, so let\'s match the policy and endorsements to the contract first.',
+ ask:'Can you send me the insurance section of the contract and the certificate request?',
+ avoid:'Never issue or promise certificate wording, additional-insured status or notice rights the policy doesn\'t give.'},
+{id:'paperwork',title:'"Too much paperwork / no time"',
+ re:/\btoo much (paperwork|hassle|work|time)\b|\b(don'?t|do not) (have|got) (the )?time\b|\b(don'?t|do not) want to (fill out|deal with|do) (all )?(the |that |those )?(paperwork|forms|applications|apps)|\b(long|lot of|so many) (forms|applications|questions|paperwork)\b|\b(what a|such a|it'?s a) hassle\b|\btakes too long\b/,
+ why:'Friction, not disinterest. Make it easy and do the heavy lifting.',
+ say:'I\'ll do the heavy lifting. Most of what I need is on your current declarations page and loss runs. Send those and I\'ll pre-fill everything for you to review.',
+ ask:'Can you snap a photo of your current declarations page and email it to me today?',
+ avoid:'Don\'t guess at application answers to save time. Have them review every answer.'},
+{id:'misdescribe',title:'"Can the application just say…"',
+ re:/\b(the )?(app|application) can (just )?say\b|\bcan (the |we |you )?(app|application)( just)? say\b|\b(just )?(put|list) (us|it|me|them) (down )?as\b|\bcan we (just )?(leave|keep) (that|it|them) off\b|\b(don'?t|do not) (put|mention) (that|the roofing|the claims?|the subs)\b|\bwe never do roofing\b|\bnobody works above\b/,
+ why:'They think a simpler description will be easier or cheaper to place. Actual operations drive eligibility and coverage.',
+ say:'Let\'s describe the work exactly as it is, including heights, roofing and subs. If the application doesn\'t match, a claim can be denied.',
+ ask:'What work do your employees and subs actually do on a typical job?',
+ avoid:'Never help a prospect leave out or misstate operations, payroll, subs or losses.'},
+{id:'subs',title:'"My subs are 1099 / no employees"',
+ re:/\b(no|don'?t have any|do not have any|zero) employees\b|\bjust (me|myself|me and my (wife|husband|son|daughter|partner))\b|\b(1099|ten ninety nine|subcontractors?|subs|contract labor)\b.{0,40}\btheir own (insurance|coverage|comp|workers comp)|\b(they|subs|guys) (have|carry|got) their own (insurance|coverage|comp)\b|\b(they'?re|they are) (all )?(independent contractors|1099|ten ninety nine)\b|\b(workers'? )?comp (doesn'?t|does not) apply\b|\b(comp|workers comp) exemption\b|\bexempt from (workers comp|comp)\b|\b(only|all) (1099|ten ninety nine|subs|subcontractors)\b|\bwe (just|only) use (subs|subcontractors)\b/,
+ why:'The 1099 label alone doesn\'t settle comp. Uninsured subs often turn into payroll at audit.',
+ say:'The 1099 label alone may not settle it. Let\'s list the work, the state and the certificates, because uninsured subs can show up as your payroll at audit.',
+ ask:'Do you collect a current certificate from every sub before they start work?',
+ avoid:'Don\'t give a blanket answer from "1099"; state rules and audit treatment vary.'},
+{id:'audit',title:'Audit worries',
+ re:/\baudit\b.{0,30}\b(bill|charge|surprise|killed|hit|owed|owe|came back|additional|extra)\b|\b(owed|owe|pay|paid) .{0,25}(after|at|from) (the |our |an )?audit\b|\b(don'?t|do not) want an audit\b|\b(they'?ll|they will) charge (us|me) more later\b|\bclass code (is|was) wrong\b|\bpayroll changes\b/,
+ why:'Audit bills come from low payroll or sales estimates, wrong class codes, or uninsured subs.',
+ say:'Audits adjust premium to actual payroll and class. If we set the estimates right and track sub certificates, the audit should land close to even.',
+ ask:'What payroll and job duties were used for your current estimate?',
+ avoid:'Don\'t guarantee the final premium or lowball exposures to make a quote look cheaper.'},
+{id:'hnoa',title:'"They drive their own cars"',
+ re:/\b(employees?|guys|they|we) (use|drive) (their|our) (own|personal) (cars?|trucks?|vehicles?)\b|\bpersonal (vehicles?|cars?|trucks?)\b|\b(rent|rented|borrow) (a |the )?(vans?|trucks?|cars?|vehicles?)\b|\bonly (have )?one truck\b|\bnobody drives (much|for (work|business))\b|\bpersonal (auto|policy) covers\b/,
+ why:'They think only company vehicles create an auto exposure. Hired and non-owned auto is a separate business risk.',
+ say:'Let\'s list every vehicle used for work: company, personal and rented. If an employee has an accident on a work errand, the business can get pulled in.',
+ ask:'Do employees ever use their own or rented vehicles for errands, deliveries or client visits?',
+ avoid:'Don\'t promise their personal auto or a business policy covers every use without checking the forms.'},
+{id:'property',title:'"My landlord covers it"',
+ re:/\b(only|just) need (general )?liability\b|\b(my|our|the) landlord('?s)? (covers|insures|has (insurance|it covered))\b|\bhomeowners?( policy| insurance)? covers (the|my|our) business\b|\b(don'?t|do not) have (any )?inventory\b|\b(i|we) rent,? so (i|we) (don'?t|do not) need\b/,
+ why:'They assume a landlord\'s or personal policy protects their equipment, contents and improvements.',
+ say:'The landlord\'s policy is built to protect the landlord. Let\'s check your lease and what you own before deciding what to leave out.',
+ ask:'Do you own or rent equipment, inventory, or improvements to the space?',
+ avoid:'Don\'t say every BOP includes the same coverages; check the form.'},
+{id:'garage',title:'"Garage liability covers customer cars"',
+ re:/\bgarage (policy|liability|insurance) covers (the )?(customer|customers'?|their) (cars?|vehicles?)\b|\b(don'?t|do not) need garage ?keepers\b|\bcustomers? (are|is) responsible\b|\bkeep (customer |customers'? |the )?(cars?|vehicles?) overnight\b|\bgarage liability covers (all )?that\b/,
+ why:'Garage liability and garagekeepers cover different exposures. Customer vehicles in their care are a garagekeepers question.',
+ say:'Garage liability and garagekeepers cover different things. Let\'s look at what you do with customers\' vehicles so we know what you actually need.',
+ ask:'Do you keep, store, repair or road-test customers\' vehicles?',
+ avoid:'Don\'t promise customer-car coverage without reviewing the garage policy and endorsements.'},
+{id:'surplus',title:'"Is a surplus lines carrier safe?"',
+ re:/\b(surplus lines?|non[- ]?admitted|excess and surplus|e ?& ?s|e and s)\b|\bunlicensed (insurer|carrier|company)\b|\b(want|prefer) an admitted\b|\bguaranty fund\b|\b(never heard of|who is|who'?s) (that|this|the) (company|carrier|insurer|insurance company)\b|\bis (that|this|the) (company|carrier|insurer) (legit|any good|safe|rated|stable|real)\b/,
+ why:'A fair concern. Surplus lines carriers aren\'t backed by the state guaranty fund (FIGA in Florida), and their forms vary more.',
+ say:'Good question. Surplus lines carriers write risks the standard market won\'t, and there\'s no state guaranty fund behind them. Let\'s compare the carrier and the terms together.',
+ ask:'Would it help to review the carrier\'s rating, the key exclusions and the required disclosures side by side?',
+ avoid:'Give the required surplus lines disclosures. Never call it "the same as" an admitted policy.'},
+{id:'deductible',title:'Deductible pushback',
+ re:/\bdeductible\b.{0,25}\b(too (high|much|big)|lower|higher|raise|smaller|can'?t afford)\b|\b(lower|smaller|raise|higher|reduce) (the |my |our |that )?deductible/,
+ why:'A trade-off between premium and out-of-pocket cost. Show both sides.',
+ say:'We can go either way. A higher deductible lowers premium; a lower one costs more up front. Let\'s pick a number you could pay tomorrow without it hurting.',
+ ask:'What could you pay out of pocket on a claim without it hurting cash flow?',
+ avoid:''},
+{id:'umbrella',title:'"Why do I need an umbrella?"',
+ re:/\b(why|do (i|we)|would (i|we)|not sure (i|we)|don'?t think (i|we)) (even |really )?(need|want) (an |the )?(umbrella|excess)\b|\bumbrella\b.{0,25}\b(overkill|unnecessary|too much|waste|don'?t need)\b|\b(a |one )?million (is|should be) (enough|plenty)\b|\b(limits|coverage) (is|are) (enough|plenty)\b/,
+ why:'Underestimates how big a serious auto or injury claim can get.',
+ say:'A bad auto accident or injury lawsuit can blow past a million-dollar limit. An umbrella sits over your GL, auto and employer\'s liability.',
+ ask:'Do any of your contracts require more than a million in limits?',
+ avoid:'Don\'t quote umbrella pricing until underlying limits and vehicles are confirmed.'},
+{id:'online',title:'"I can get it cheaper online"',
+ re:/\b(online|website|on the internet|an app)\b.{0,30}\b(cheaper|less|quote|lower)\b|\b(got|get|found|saw) (a )?quotes? online\b|\b(next insurance|hiscox|thimble|simply business|coverwallet)\b|\bdirect(ly)? (with|from|through) (the )?(carrier|company|insurer)\b/,
+ why:'Online can fit very simple risks, but class codes, exclusions and endorsements often don\'t match the real operations.',
+ say:'Online can work for simple businesses. The issue I see is class codes. If it doesn\'t match what you actually do, a claim can be denied. Let me compare line by line.',
+ ask:'Can you send me that quote so we compare the same forms, limits and exclusions?',
+ avoid:'Read their quote before saying it won\'t respond. Compare form to form.'},
+{id:'payment',title:'"Can\'t pay it all up front"',
+ re:/\b(can'?t|cannot|can not) (pay|afford|swing|do) (it |that |the whole thing )?(all )?(at once|up ?front|in full|in one shot)|\b(down payment|deposit)\b.{0,20}\b(too (high|much|big)|steep|a lot)\b|\bmonthly (payments?|plan|installments?)\b|\bpayment plans?\b|\bpay(ing)? (it )?monthly\b|\binstallments?\b|\bfinanc(e|ing) it\b/,
+ why:'A cash-flow question, not a coverage one. Usually solvable.',
+ say:'That\'s really common. We can look at the carrier\'s installment plan or premium financing to spread it out. Let me get you the real down payment and monthly figures.',
+ ask:'What monthly amount works with your cash flow?',
+ avoid:'Don\'t guess a monthly amount. Disclose finance charges and what happens if a payment is missed.'},
+{id:'trust',title:'"Insurance never pays"',
+ re:/\b(insurance( companies)?|they|carriers?) (never|don'?t|do not|won'?t) (pay|cover anything)\b|\b(denied|rejected) (my|our|a|the) claim\b|\bclaim (got |was )?(denied|rejected)\b|\bbad (experience|claims experience)\b|\b(rip ?off|scam|legalized robbery)\b|\b(fought|fight|fighting) (us|me) on\b/,
+ why:'A trust problem. Listen first. Often the denial came from a gap nobody explained.',
+ say:'I\'m sorry that happened. Can you tell me what the claim was? A lot of denials come from gaps nobody explained up front, and that\'s what I want to catch.',
+ ask:'Do you remember the reason they gave for not covering it?',
+ avoid:'Don\'t promise that a future claim will be paid.'},
+{id:'same',title:'"It\'s all the same coverage"',
+ re:/\b(it'?s|its|they'?re|they are|insurance is) all (the same|alike)\b|\bsame (coverage|policy|thing)\b|\bapples to apples\b|\b(just|only) (care|caring|worried|looking) (about|at) (the )?price\b|\binsurance is insurance\b/,
+ why:'Commercial forms differ a lot: exclusions, sublimits, who counts as an additional insured.',
+ say:'They look the same on a quote summary, but the forms behind them can be very different. I\'ll give you a side-by-side so you see exactly what changes.',
+ ask:'Would a one-page comparison make the decision easier?',
+ avoid:'Don\'t call two policies identical unless you\'ve compared forms and endorsements.'}
+];
+
+const SIGNALS=[
+{id:'shape',title:'Buying signal: they\'re shaping the policy',
+ re:/\bwhat (would|does|will) it cost (if|to) (i |we )?add\b|\b(can|could) you (increase|raise|bump up) (the |my |our )?limits?\b|\b(can|could) you add (my|our|the) (gc|general contractor|landlord|lender|client)\b|\bwhat (are|would be) the payment options\b|\b(can|could) my (business )?(partner|wife|husband) (join|get on)\b/,
+ why:'Questions about options mean they\'re picturing themselves with the policy.',
+ say:'Good question. Let me price that so you can see both versions side by side.',
+ ask:'Is that something you want in the final quote?',
+ avoid:'Don\'t promise an add-on is available until the carrier confirms it.'},
+{id:'buy',title:'Buying signal: move to the close',
+ re:/\bhow (soon|fast|quickly) (can|could|would) (we|i|you|it|this|coverage)\b|\bwhat (do|would) you need (from (me|us)|to get (started|going))\b|\bwhat'?s the next step\b|\bnext steps?\b|\b(send|email) (me|us) (the |an? )?(application|app|apps|paperwork|docs|documents)\b|\bhow (do|would|can) (i|we) pay\b|\bwhen (would|will|can|could) (coverage|it|the policy) (start|begin|be effective)\b|\beffective date\b|\b(can|could) (we|you) (bind|start|lock) (it|this|that|coverage|in)\b|\bbind (it|this) today\b|\b(can|could) (we|you) make it effective\b|\blet'?s (do it|do this|move forward|go ahead|get (it|this) (started|going|done))\b|\bwhere do i sign\b|\bif (you|we) can (beat|match|get)\b/,
+ why:'They\'re asking how, not whether. Stop selling and make the next step easy.',
+ say:'Great. Let me confirm the carrier, limits, deductibles, price and start date with you, then I\'ll send the application to review and sign.',
+ ask:'Do you want coverage to start on your current expiration date, or sooner?',
+ avoid:'Don\'t say they\'re covered until the carrier confirms the bind in writing.'}
+];
+
+const CAUTIONS=[
+{id:'covpromise',title:'Careful: coverage promise',
+ re:/\b(you'?re|you are|you'?ll be|you will be|you'?d be|you would be|that'?s|that is|it'?s|it is|that would be) (fully |totally |completely |definitely |100% |100 percent |absolutely )?covered\b|\bcovers? (everything|anything|it all)\b|\b(no|zero) exclusions\b|\b(they'?ll|they will|it'?ll|it will|the carrier will) (definitely |absolutely )?pay (for )?(that|it|the claim)\b/,
+ why:'Saying "you\'re covered" can create E&O exposure if the policy wording says otherwise.',
+ say:'Let me rephrase: the policy terms and the facts decide coverage. I\'ll show you the exact wording that applies.',
+ ask:'',avoid:'Point to the form and endorsements instead of promising an outcome.'},
+{id:'bindnow',title:'Careful: bound before confirmed',
+ re:/\b(you'?re|you are) (covered|bound|insured) (starting |as of )?(now|today|right now)\b|\bcoverage starts (now|today|right now)\b|\bconsider (yourself|it) (covered|bound)\b/,
+ why:'Coverage isn\'t in force until the carrier accepts and binds it.',
+ say:'Let me correct that: I\'ll confirm the carrier has bound it, then send you written confirmation of the effective date.',
+ ask:'',avoid:'Never say "you\'re covered" before the binder is confirmed.'},
+{id:'pricepromise',title:'Careful: price promise',
+ re:/\b(i|we)('ll| will| can| could)? (definitely |guarantee(d)? |promise |for sure )?(beat (that|their|your|it)|save you( money| a lot)?|get you (a )?(lower|better|cheaper))\b|\bguarantee (a |you |that |this |the )?(lower|better|cheaper|savings|price|premium|rate)\b|\bcheaper than (what )?(you'?re|you are) paying\b|\b(premium|price) (won'?t|will not) (change|go up)\b|\baudit (won'?t|will not|isn'?t going to) change\b/,
+ why:'Final premium depends on underwriting and audit. A promise you can\'t keep costs trust and creates E&O risk.',
+ say:'Let me be precise: that\'s the current indication. The carrier\'s final terms depend on underwriting and verification.',
+ ask:'',avoid:'No savings or price guarantees until you have real, bound terms.'},
+{id:'certpromise',title:'Careful: certificate promise',
+ re:/\b(certificate|cert|coi) (makes|will make|adds|will add) (them|him|her|you|the gc) (an )?additional insured\b|\b(i'?ll|i will|we'?ll|we will) (just )?(put|add) (it|that|the waiver|primary|them) on the (cert|certificate|coi)\b/,
+ why:'A certificate can\'t create coverage or insured status. Only the policy or an endorsement can.',
+ say:'Let me correct that: a certificate doesn\'t add insured status by itself. I\'ll check whether the policy or an endorsement provides it.',
+ ask:'',avoid:'Only show what the policy actually provides.'},
+{id:'comp1099',title:'Careful: comp classification',
+ re:/\b(they'?re|they are) (all )?(1099|ten ninety nine),? so\b|\b(workers'? )?comp (doesn'?t|does not|won'?t) apply\b|\byou don'?t need (workers'? )?comp\b/,
+ why:'Whether comp applies depends on the facts, the policy and state rules, not the tax form.',
+ say:'Let me be careful there: classification and comp requirements depend on the facts and state rules. Let\'s verify before we decide.',
+ ask:'',avoid:'Don\'t give a blanket answer based on "1099".'},
+{id:'esame',title:'Careful: surplus lines disclosure',
+ re:/\b(surplus lines?|e ?& ?s|non[- ]?admitted) (is|are) (the same|just like|no different)\b|\bsame as (an )?admitted\b/,
+ why:'Surplus lines differ from admitted coverage, including no guaranty fund protection.',
+ say:'Let me be precise: there are differences, including guaranty-fund protection. I\'ll walk you through the disclosures and the policy terms.',
+ ask:'',avoid:'Give the state-required surplus lines disclosures.'},
+{id:'misstate',title:'Careful: application accuracy',
+ re:/\b(put|list|write) (it|that|them|you|those guys) down as\b|\bleave (that|it|them|those) off (the )?(app|application|form)\b|\bdon'?t (mention|tell (them|the carrier|underwriting)) (about )?(that|it|the claims?)\b|\bjust say (you|there'?s|you'?ve) (have )?(no|don'?t have)\b/,
+ why:'Misstating exposures, operations or losses can void coverage and creates E&O risk.',
+ say:'Actually, let\'s list it exactly as it is. If the application is wrong, a claim could be denied.',
+ ask:'',avoid:'Every application answer should match what the client told you.'}
+];
+
+const NUDGES={
+ talk:{id:'n-talk',title:'You\'re doing most of the talking',why:'You\'ve had well over half the airtime. Hand the floor back.',say:'Pause, and ask an open question.',ask:'What\'s the biggest headache with your insurance right now?',avoid:'',cool:150000},
+ ask:{id:'n-ask',title:'Ask a question',why:'No question from you in the last two minutes.',say:'Turn it back to them with a question about their business.',ask:'Walk me through a typical job from start to finish?',avoid:'',cool:150000},
+ xdate:{id:'n-xdate',title:'Get the renewal date',why:'Three minutes in and the expiration date hasn\'t come up. It sets your whole timeline.',say:'',ask:'When does your current policy renew?',avoid:'',cool:240000}
+};
+
+const CHECK=[
+{id:'ops',label:'What the business does',re:/\b(what (do you|does your (company|business))|kind of work|type of (work|business)|operations|scope of work|typical job|we do (commercial|residential|\w+ing)|landscap|roofing|plumb|electrical|hvac|janitorial|restaurant|trucking|auto repair|body shop|garage)/},
+{id:'years',label:'Years in business',re:/\b(years in business|how long (have you|has the business|has your business) been|been in business|established in|started (the|my|our) (business|company)|(\w+|\d+) years (in business|doing this))/},
+{id:'revenue',label:'Revenue / gross sales',re:/\b(revenue|gross (sales|receipts)|annual sales|sales (are|were|last year)|bring in about|do about .{0,25}(a year|thousand|million))/},
+{id:'payroll',label:'Payroll',re:/\b(payroll|wages|salaries|w-?2)\b/},
+{id:'people',label:'Employees and subs',re:/\b(employees|staff|crew|workers|guys|subcontract|subs\b|1099|ten ninety nine|full[- ]time|part[- ]time)/},
+{id:'vehicles',label:'Vehicles and drivers',re:/\b(vehicles?|trucks?|vans?|drivers?|fleet|trailers?|company cars?|commercial auto|personal cars?)\b/},
+{id:'carrier',label:'Current carrier and premium',re:/\b(current (carrier|company|insurance|insurer|policy|premium|agent)|who (are you|is your insurance|you'?re) (insured )?with|(insured|insurance) (is )?(with|through)|paying (now|currently|right now|a year|annually)|premium is)\b/},
+{id:'xdate',label:'Renewal / expiration date',re:/\b(renew(al|s|ed)?|expir(es|ation|e)|x[- ]date|policy (period|term))\b/},
+{id:'losses',label:'Claims and loss runs',re:/\b(claims?|loss(es)? runs?|loss history|losses|accidents?)\b/},
+{id:'contracts',label:'Contract requirements',re:/\b(contracts?|certificates?|cert|coi|additional insured|waiver|non[- ]?contributory|general contractor|gc)\b/},
+{id:'property',label:'Locations, property, equipment',re:/\b(building|location|property|lease|landlord|equipment|tools|inventory|square feet|warehouse)\b/},
+{id:'decider',label:'Decision maker',re:/\b(decision|decide|who else|partner|sign off)\b/}
+];
+
+const DEMO=[
+['me','Hi, this is Chris. Thanks for taking my call. Is now still a good time?'],
+['prospect','I\'ve got a few minutes. Honestly, we\'re pretty happy with our agent. We\'ve been with him for years.'],
+['me','That\'s great. When does your policy renew?'],
+['prospect','I think it renews in March. Can you just send me something by email?'],
+['me','Happy to. What kind of work do you do, and how many employees do you have?'],
+['prospect','We do commercial landscaping. Six guys on payroll and a couple of 1099 subs. They have their own insurance, I think.'],
+['me','Do you collect certificates from those subs?'],
+['prospect','Not really. Our last audit was a surprise, we owed like four grand.'],
+['me','That\'s common, and fixable. What\'s your revenue roughly?'],
+['prospect','About nine hundred thousand. Honestly the price is what kills me, it\'s way too expensive.'],
+['me','Understood. Have you had any claims in the last five years?'],
+['prospect','We\'ve never had a claim. And the GC just needs a certificate with additional insured on it.'],
+['me','I can make sure that endorsement is there. I can definitely save you money, and you\'d be fully covered.'],
+['prospect','Okay. What do you need from me to get started?']
+];
+
+const KEYTERMS=['additional insured','waiver of subrogation','loss runs','certificate of insurance','general liability','workers comp','garagekeepers','hired and non-owned','umbrella','surplus lines','deductible','premium','renewal'];
+</script>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const APP_VERSION='5';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LABEL={me:'You',prospect:'Prospect',call:'Call'};
+const TAG={objection:'Objection',signal:'Buying signal',caution:'Careful',nudge:'Coaching'};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const DEF={engine:'chrome',listen:'both',dgKey:'',antKey:'',model:'claude-haiku-5-5',aiOn:false,remember:false,rcAnnounce:true,myName:''};
+let cfg={...DEF};
+try{const saved=JSON.parse(localStorage.getItem('callcoach.cfg')||'null');if(saved)cfg={...DEF,...saved};}catch(e){}
+function saveCfg(){try{const c={...cfg};if(!c.remember){c.dgKey='';c.antKey='';}localStorage.setItem('callcoach.cfg',JSON.stringify(c));}catch(e){}}
+
+const norm=t=>' '+t.toLowerCase().replace(/[‘’]/g,"'").replace(/[^a-z0-9'$%&\s-]/g,' ').replace(/\s+/g,' ')+' ';
+const fmt=ms=>{const s=Math.max(0,Math.floor(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
+const aiReady=()=>cfg.aiOn&&cfg.antKey;
+
+/* ---------- learned playbook (from uploaded RingCentral transcripts) ---------- */
+const LKEY='callcoach.learned';
+let L={triggers:{},examples:{},cards:[],calls:[]};
+try{const x=JSON.parse(localStorage.getItem(LKEY)||'null');if(x&&typeof x==='object')L={...L,...x};}catch(e){}
+function saveL(){try{localStorage.setItem(LKEY,JSON.stringify(L));return true;}catch(e){lmsg('Could not save: this browser blocked storage or it is full. Use Export playbook to keep a copy.');return false;}}
+const escRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+let EXTRA={};
+function compileLearned(){
+  EXTRA={};
+  for(const [id,arr] of Object.entries(L.triggers||{})){
+    const parts=(arr||[]).map(p=>escRe(norm(p).trim())).filter(x=>x.length>=3);
+    if(parts.length)EXTRA[id]=new RegExp('\\b('+parts.join('|')+')\\b');
+  }
+  for(let i=PLAYBOOK.length-1;i>=0;i--)if(PLAYBOOK[i].custom)PLAYBOOK.splice(i,1);
+  for(const c of L.cards||[])PLAYBOOK.push({...c,custom:true,re:/(?!)/});
+}
+function matchCard(card,t){return t.match(card.re)||(EXTRA[card.id]?t.match(EXTRA[card.id]):null);}
+const OUT_RANK={won:3,followup:2,unknown:1,lost:0};
+function bestExample(id){
+  const ex=(L.examples||{})[id];if(!ex||!ex.length)return null;
+  return [...ex].sort((a,b)=>(OUT_RANK[b.outcome]??1)-(OUT_RANK[a.outcome]??1)||(b.t||0)-(a.t||0))[0];
+}
+compileLearned();
+
+/* transcript reading */
+async function docxText(buf){
+  const dv=new DataView(buf),u8=new Uint8Array(buf);let eocd=-1;
+  for(let i=u8.length-22;i>=Math.max(0,u8.length-70000);i--)if(dv.getUint32(i,true)===0x06054b50){eocd=i;break;}
+  if(eocd<0)throw new Error('this does not look like a Word file');
+  const n=dv.getUint16(eocd+10,true);let p=dv.getUint32(eocd+16,true);
+  for(let k=0;k<n;k++){
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),fnl=dv.getUint16(p+28,true),exl=dv.getUint16(p+30,true),cml=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true);
+    const name=new TextDecoder().decode(u8.subarray(p+46,p+46+fnl));
+    if(name==='word/document.xml'){
+      const start=off+30+dv.getUint16(off+26,true)+dv.getUint16(off+28,true),data=u8.subarray(start,start+csize);
+      const xml=method===0?new TextDecoder().decode(data):await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
+      const doc=new DOMParser().parseFromString(xml,'application/xml'),W='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+      return [...doc.getElementsByTagNameNS(W,'p')].map(pp=>[...pp.getElementsByTagNameNS(W,'*')].map(el=>el.localName==='t'?el.textContent:el.localName==='br'?'\n':el.localName==='tab'?' ':'').join('')).join('\n');
+    }
+    p+=46+fnl+exl+cml;
+  }
+  throw new Error('no text found in the Word file');
+}
+function parseTranscript(raw){
+  const lines=raw.replace(/^﻿/,'').replace(/\r/g,'').split('\n');
+  const TIME='\\d{1,2}:\\d{2}(?::\\d{2})?(?:[.,]\\d+)?';
+  const lone=new RegExp('^[\\[(]?'+TIME+'[\\])]?$'),cue=new RegExp('^'+TIME+'\\s*-->'),lead=new RegExp('^[\\[(]?'+TIME+'[\\])]?\\s*[-–]?\\s*');
+  const header=new RegExp('^(.{1,40}?)\\s*[\\[(]?'+TIME+'[\\])]?$');
+  const utts=[];let cur=null;
+  const add=(spk,txt)=>{txt=(txt||'').trim();if(cur&&cur.spk===spk){if(txt)cur.text+=(cur.text?' ':'')+txt;return;}cur={spk,text:txt};utts.push(cur);};
+  for(let ln of lines){
+    ln=ln.trim();
+    if(!ln||/^WEBVTT/i.test(ln)||/^NOTE\b/.test(ln)||/^\d+$/.test(ln)||cue.test(ln)||lone.test(ln))continue;
+    let m=ln.match(/^<v\s+([^>]+)>(.*)$/i);
+    if(m){add(m[1].trim(),m[2].replace(/<\/v>/i,''));continue;}
+    m=ln.match(header);
+    if(m&&!/[.?!,]$/.test(m[1])&&m[1].trim().split(/\s+/).length<=5&&/[a-z]/i.test(m[1])){add(m[1].trim(),'');continue;}
+    ln=ln.replace(lead,'');
+    m=ln.match(/^([A-Za-z0-9(+][^:]{0,40}?)\s*:\s+(.+)$/);
+    if(m&&m[1].trim().split(/\s+/).length<=5&&!/\b(and|but|so|because|the|that|if|when|i|we)\b/i.test(m[1])){add(m[1].trim(),m[2]);continue;}
+    if(cur)cur.text+=(cur.text?' ':'')+ln;else add('Unknown',ln);
+  }
+  return utts.filter(u=>u.text.trim());
+}
+function guessMe(speakers,utts){
+  const my=(cfg.myName||'').toLowerCase().trim();
+  if(my){const hit=speakers.find(s=>{const x=s.toLowerCase();return x.includes(my)||my.includes(x)||x.split(/\s+/)[0]===my.split(/\s+/)[0];});if(hit)return hit;}
+  const named=speakers.filter(s=>!/^(speaker|caller|unknown|customer|guest|participant|prospect|client)\b|^[\d\s()+.-]+$/i.test(s));
+  if(named.length===1)return named[0];
+  return utts[0]?.spk||speakers[0];
+}
+const MISS=/\b(but|not|don'?t|can'?t|won'?t|already|too|expensive|price|cost|busy|think|later|maybe|worried|concern|problem|issue|why|happy with|no thanks|afraid|unless|honestly)\b/;
+function analyzeCall(c){
+  const r={obj:[],sig:[],cau:[],missed:[],me:0,pr:0,q:0,checks:new Set()};
+  const single=c.speakers.length<2,role=u=>single?'call':(u.spk===c.me?'me':'prospect');
+  const seen={};
+  c.utts.forEach((u,i)=>{
+    const who=role(u),t=norm(u.text),w=u.text.split(/\s+/).length;
+    if(who==='me'){r.me+=w;r.q+=countQ(u.text);}else r.pr+=w;
+    for(const k of CHECK)if(k.re.test(t))r.checks.add(k.id);
+    let hit=false;
+    if(who!=='me'){
+      for(const card of SIGNALS)if(matchCard(card,t)){hit=true;r.sig.push({card,quote:u.text});}
+      for(const card of PLAYBOOK)if(matchCard(card,t)){hit=true;seen[card.id]=(seen[card.id]||0)+1;
+        if(seen[card.id]<=3){const rep=[];for(let j=i+1;j<c.utts.length&&rep.length<2;j++){if(role(c.utts[j])==='me')rep.push(c.utts[j].text);else if(rep.length)break;}
+          r.obj.push({card,quote:u.text,reply:clip(rep.join(' '),360)});}}
+      if(!hit&&who==='prospect'&&w>=4&&MISS.test(t)&&r.missed.length<15)r.missed.push(u.text);
+    }
+    if(who!=='prospect')for(const card of CAUTIONS)if(matchCard(card,t))r.cau.push({card,quote:u.text});
+  });
+  c.r=r;return r;
+}
+
+/* learn dialog */
+const learnDlg=$('#learnDlg');let pending=[];
+function lmsg(t){const m=$('#lMsg');m.textContent=t;m.hidden=!t;}
+function addCall(name,text){
+  const utts=parseTranscript(text);
+  if(utts.length<2){lmsg('Could not find a conversation in "'+name+'". Try pasting the text instead.');return;}
+  const speakers=[...new Set(utts.map(u=>u.spk))];
+  const c={id:'p'+Date.now()+Math.random().toString(36).slice(2,6),name,utts,speakers,me:guessMe(speakers,utts),outcome:'unknown',ai:null};
+  analyzeCall(c);pending.push(c);
+  lmsg(speakers.length<2?'"'+name+'" has no speaker names, so every line is treated as the whole call.':'');
+}
+async function addFile(f){
+  const n=f.name.toLowerCase(),base=f.name.replace(/\.[^.]+$/,'');
+  try{
+    if(n.endsWith('.pdf')){lmsg('PDF can\'t be read directly. Open it, select all, copy, and paste the text into the box.');return;}
+    if(n.endsWith('.doc')){lmsg('Old .doc files can\'t be read. Save it as .docx or .txt first.');return;}
+    addCall(base,n.endsWith('.docx')?await docxText(await f.arrayBuffer()):await f.text());
+  }catch(e){lmsg('Could not read '+f.name+': '+e.message);}
+}
+const cardOpts=sel=>[...PLAYBOOK,...SIGNALS].map(c=>'<option value="'+c.id+'"'+(c.id===sel?' selected':'')+'>'+esc(c.title)+'</option>').join('')+'<option value="__new"'+(sel==='__new'?' selected':'')+'>New objection…</option>';
+function teachRow(ci,phrase,card,title){
+  return '<div class="teach" data-c="'+ci+'"><input value="'+esc(clip(phrase,140))+'" aria-label="Phrase to listen for"><select aria-label="Which card">'+cardOpts(card||'__new')+'</select><button data-act="teach">Teach</button>'+
+    '<input class="newtitle" placeholder="Name the new objection, e.g. &quot;Locked into a 3-year policy&quot;" value="'+esc(title||'')+'"'+((card||'__new')==='__new'?'':' hidden')+' aria-label="New objection name"></div>';
+}
+function renderLearn(){
+  $('#lCalls').innerHTML=pending.map((c,ci)=>{
+    const r=c.r,tot=r.me+r.pr,pct=tot?Math.round(r.me/tot*100):0;
+    const obj=r.obj.length?'<ul>'+r.obj.map(o=>'<li><b>'+esc(o.card.title)+'</b>: "'+esc(clip(o.quote,160))+'"'+(o.reply?'<br><span class="reply">You replied: "'+esc(clip(o.reply,220))+'"</span>':'')+'</li>').join('')+'</ul>':'<p class="small mute" style="margin:0">No objections recognized yet.</p>';
+    const cau=r.cau.length?'<h4>Risky phrases you said</h4><ul>'+r.cau.map(o=>'<li><b>'+esc(o.card.title.replace('Careful: ',''))+'</b>: "'+esc(clip(o.quote,160))+'"</li>').join('')+'</ul>':'';
+    const miss=r.missed.length?'<h4>Lines the coach didn\'t recognize</h4><p class="small mute" style="margin:0">If one is an objection, trim it to the key words, pick the card it belongs to, and click Teach.</p>'+r.missed.map(m=>teachRow(ci,m,'__new')).join(''):'';
+    const ai=c.ai?'<h4>Claude\'s suggestions</h4>'+(c.ai.tips&&c.ai.tips.length?'<ul>'+c.ai.tips.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+(c.ai.missed||[]).map(m=>teachRow(ci,m.phrase,PLAYBOOK.some(p=>p.id===m.card_id)?m.card_id:'__new',m.new_title)).join(''):'';
+    return '<article class="lcall" data-c="'+ci+'"><h3>'+esc(c.name)+'</h3>'+
+      '<div class="lrow"><label class="field"><span class="small">Which speaker is you?</span><select data-k="me">'+c.speakers.map(s=>'<option'+(s===c.me?' selected':'')+'>'+esc(s)+'</option>').join('')+'</select></label>'+
+      '<label class="field"><span class="small">How did the call end?</span><select data-k="outcome">'+[['unknown','Not sure'],['won','Sold / bound'],['followup','Follow-up set'],['lost','Not sold']].map(([v,l])=>'<option value="'+v+'"'+(c.outcome===v?' selected':'')+'>'+l+'</option>').join('')+'</select></label></div>'+
+      '<p class="small" style="margin:0">'+c.utts.length+' turns · '+r.obj.length+' objections · '+r.sig.length+' buying signals · you talked '+pct+'% · '+r.q+' questions · discovery '+r.checks.size+'/'+CHECK.length+'</p>'+
+      '<h4>Objections found</h4>'+obj+cau+miss+ai+
+      '<div class="lactions"><button class="primary" data-act="save">Save replies to playbook</button>'+(aiReady()?'<button data-act="ai">Analyze with Claude</button>':'')+'<button data-act="drop">Remove</button></div></article>';
+  }).join('');
+  renderLib();
+}
+function renderLib(){
+  const nEx=Object.values(L.examples||{}).reduce((a,b)=>a+b.length,0),nTr=Object.values(L.triggers||{}).reduce((a,b)=>a+b.length,0);
+  const byId=Object.fromEntries([...PLAYBOOK,...SIGNALS].map(c=>[c.id,c.title]));
+  const tr=Object.entries(L.triggers||{}).filter(([,a])=>a.length).map(([id,a])=>'<div><b class="small">'+esc(byId[id]||id)+'</b><br>'+a.map((ph,i)=>'<span class="chip">'+esc(ph)+'<button data-act="untrig" data-id="'+id+'" data-i="'+i+'" aria-label="Remove phrase">×</button></span>').join('')+'</div>').join('');
+  $('#lLib').innerHTML='<p style="margin:0">'+(L.calls||[]).length+' calls saved · '+nTr+' phrases taught · '+nEx+' real replies saved · '+(L.cards||[]).length+' new objections</p>'+(tr||'<p class="small mute" style="margin:0">Phrases you teach will show up here.</p>');
+}
+function relearn(){compileLearned();pending.forEach(analyzeCall);renderLearn();}
+$('#learnBtn').onclick=()=>{$('#myName').value=cfg.myName||'';lmsg('');renderLearn();learnDlg.showModal();};
+$('#learnClose').onclick=()=>learnDlg.close();
+$('#myName').addEventListener('change',()=>{cfg.myName=$('#myName').value.trim();saveCfg();pending.forEach(c=>{c.me=guessMe(c.speakers,c.utts);});relearn();});
+$('#lFiles').onchange=async e=>{for(const f of [...e.target.files])await addFile(f);e.target.value='';renderLearn();};
+const dz=$('#dropZone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',async e=>{e.preventDefault();dz.classList.remove('over');for(const f of [...e.dataTransfer.files])await addFile(f);renderLearn();});
+$('#lPasteBtn').onclick=()=>{const v=$('#lPaste').value.trim();if(!v)return;addCall('Pasted transcript '+(pending.length+1),v);$('#lPaste').value='';renderLearn();};
+$('#lCalls').addEventListener('change',e=>{
+  const art=e.target.closest('.lcall'),c=art&&pending[+art.dataset.c];if(!c)return;
+  if(e.target.dataset.k==='me'){c.me=e.target.value;analyzeCall(c);renderLearn();}
+  else if(e.target.dataset.k==='outcome'){c.outcome=e.target.value;}
+  else if(e.target.tagName==='SELECT'&&e.target.closest('.teach')){e.target.closest('.teach').querySelector('.newtitle').hidden=e.target.value!=='__new';}
+});
+$('#lCalls').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;const act=b.dataset.act;
+  const art=b.closest('.lcall'),ci=art?+art.dataset.c:-1,c=pending[ci];
+  if(act==='teach'){
+    const row=b.closest('.teach'),phrase=row.querySelector('input').value.trim(),sel=row.querySelector('select').value,title=row.querySelector('.newtitle').value.trim();
+    if(norm(phrase).trim().length<3)return lmsg('Type at least a few words for the phrase.');
+    let id=sel;
+    if(sel==='__new'){if(!title)return lmsg('Give the new objection a name first.');id='c'+Date.now();
+      L.cards.push({id,title:'"'+title.replace(/^"|"$/g,'')+'"',why:'Learned from your calls.',say:'',ask:'',avoid:''});}
+    L.triggers[id]=[...new Set([...(L.triggers[id]||[]),phrase])];
+    if(saveL()){lmsg('Taught: the coach will now listen for "'+clip(phrase,80)+'".');relearn();}
+  }else if(act==='save'&&c){
+    let n=0;const t=Date.now();
+    for(const o of c.r.obj){if(!o.reply||o.reply.split(/\s+/).length<4)continue;
+      const arr=L.examples[o.card.id]=L.examples[o.card.id]||[];
+      if(arr.some(x=>x.reply===o.reply))continue;
+      arr.push({reply:o.reply,quote:clip(o.quote,200),outcome:c.outcome,call:c.name,t});n++;
+      arr.sort((a,b)=>(OUT_RANK[b.outcome]??1)-(OUT_RANK[a.outcome]??1)||b.t-a.t);arr.splice(20);}
+    L.calls.push({name:c.name,outcome:c.outcome,objections:c.r.obj.length,t});
+    if(saveL()){pending.splice(ci,1);lmsg('Saved '+n+' of your replies from "'+c.name+'". They\'ll show on the cue card the next time that objection comes up.');renderLearn();}
+  }else if(act==='drop'&&c){pending.splice(ci,1);renderLearn();}
+  else if(act==='ai'&&c){
+    b.disabled=true;b.textContent='Analyzing…';
+    const tx=c.utts.map(u=>(c.speakers.length<2?'':(u.spk===c.me?'Agent: ':'Prospect: '))+u.text).join('\n').slice(0,24000);
+    try{
+      const out=await claude(LEARN_SYS,'Existing cards (id: title):\n'+PLAYBOOK.map(x=>x.id+': '+x.title).join('\n')+'\n\nTranscript:\n'+tx,1500);
+      c.ai=JSON.parse((out.match(/\{[\s\S]*\}/)||['{}'])[0]);renderLearn();
+    }catch(err){lmsg('Claude analysis failed: '+err.message);b.disabled=false;b.textContent='Analyze with Claude';}
+  }
+});
+$('#lLib').addEventListener('click',e=>{const b=e.target.closest('button[data-act=untrig]');if(!b)return;
+  const a=L.triggers[b.dataset.id]||[];a.splice(+b.dataset.i,1);
+  if(!a.length){delete L.triggers[b.dataset.id];L.cards=L.cards.filter(x=>x.id!==b.dataset.id||(L.examples[x.id]||[]).length);}
+  saveL();relearn();});
+$('#lExport').onclick=()=>{
+  const blob=new Blob([JSON.stringify({app:'call-coach',version:1,exported:new Date().toISOString(),...L},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='call-coach-playbook-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+$('#lImport').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{const x=JSON.parse(await f.text());if(x.app!=='call-coach')throw new Error('not a Call Coach playbook');
+    for(const [id,a] of Object.entries(x.triggers||{}))L.triggers[id]=[...new Set([...(L.triggers[id]||[]),...a])];
+    for(const [id,a] of Object.entries(x.examples||{})){const cur=L.examples[id]=L.examples[id]||[];for(const ex of a)if(!cur.some(y=>y.reply===ex.reply))cur.push(ex);cur.splice(20);}
+    for(const c of x.cards||[])if(!L.cards.some(y=>y.id===c.id))L.cards.push(c);
+    L.calls=[...(L.calls||[]),...(x.calls||[])];
+    if(saveL()){lmsg('Imported the playbook from '+f.name+'.');relearn();}
+  }catch(err){lmsg('Could not import: '+err.message);}
+};
+let clearArm=0;
+$('#lClear').onclick=()=>{
+  if(Date.now()-clearArm>4000){clearArm=Date.now();$('#lClear').textContent='Click again to clear everything';return;}
+  L={triggers:{},examples:{},cards:[],calls:[]};saveL();$('#lClear').textContent='Clear learned data';lmsg('Learned data cleared.');relearn();
+};
+const LEARN_SYS='You review a commercial P&C insurance sales call transcript to improve a live objection-detection playbook. Reply with JSON only: {"missed":[{"phrase":"3-10 words copied exactly from a prospect line that expresses an objection or buying signal the existing cards may not catch","card_id":"an existing card id, or new","new_title":"short name, only when card_id is new"}],"tips":["up to 3 short, specific coaching tips for the agent based on this call"]}. Only quote words that appear in the transcript. Prefer existing card ids. Never suggest promising coverage or price, or misstating application facts.';
+
+let S;
+function reset(){
+  if(S&&S.demoT)clearTimeout(S.demoT);
+  S={running:false,demo:false,t0:0,t1:0,lines:[],fired:{},words:{me:0,prospect:0,call:0},questions:0,lastQ:0,
+     raised:[],signals:0,flags:[],checks:new Map(),hist:[],cueKind:'idle',cueAt:0,aiLast:0,aiBusy:false,aiChars:0,engines:[],streams:[],demoT:0};
+  $('#tx').innerHTML='<p class="empty" id="txEmpty">Nothing yet. Start listening, run the demo call, or type a practice line below.</p>';
+  $('#timer').textContent='0:00';
+  renderChecklist();renderHistory();renderMeters();idleCue();
+}
+
+/* ---------- notices ---------- */
+function note(msg){$('#noticeText').textContent=msg;$('#notice').hidden=false;}
+$('#noticeX').onclick=()=>{$('#notice').hidden=true;};
+
+/* ---------- cue card ---------- */
+function setLine(k,txt){$('#line'+k).hidden=!txt;$('#cue'+k).textContent=txt||'';}
+function idleCue(){
+  const cue=$('#cue');cue.dataset.kind='idle';$('#cueTag').textContent='Ready';$('#cueTime').textContent='';
+  $('#cueTitle').textContent='Ready for your next call';$('#cueHeard').textContent='';
+  $('#cueWhy').textContent='Open app.ringcentral.com in a Chrome tab. Then click Start listening, pick the RingCentral tab, and turn on "Also share tab audio". Pointers pop up here the moment the prospect raises an objection.';
+  setLine('Say','New here? Click Run demo call to watch a sample call get coached.');setLine('Ask','');setLine('Avoid','');setLine('You','');
+  $('#aiBox').hidden=!aiReady();
+}
+function showCue(item){
+  const {card,kind,quote,t}=item;const cue=$('#cue');
+  cue.dataset.kind=kind;$('#cueTag').textContent=TAG[kind];
+  $('#cueTime').textContent=S.t0?'at '+fmt(t-S.t0):'';
+  $('#cueTitle').textContent=card.title;
+  $('#cueHeard').textContent=quote?'Heard: "'+clip(quote,120)+'"':'';
+  $('#cueWhy').textContent=card.why||'';
+  setLine('Say',card.say);setLine('Ask',card.ask);setLine('Avoid',card.avoid);
+  const ex=bestExample(card.id);setLine('You',ex?'"'+clip(ex.reply,260)+'"':'');
+  if(ex)$('#youLabel').textContent=ex.outcome==='won'?'Worked before':'You said';
+  cue.classList.remove('flash');void cue.offsetWidth;cue.classList.add('flash');
+  S.cueKind=kind;S.cueAt=Date.now();
+}
+
+/* ---------- detection ---------- */
+function fire(card,kind,quote){
+  const now=Date.now();
+  if(now-(S.fired[card.id]||0)<(card.cool||45000))return;
+  S.fired[card.id]=now;
+  const item={card,kind,quote:(quote||'').trim(),t:now};
+  S.hist.unshift(item);
+  if(kind==='objection'&&!S.raised.includes(card.title))S.raised.push(card.title);
+  if(kind==='signal')S.signals++;
+  if(kind==='caution')S.flags.push(card.title.replace('Careful: ','')+': "'+clip(item.quote,90)+'"');
+  if(!(kind==='nudge'&&S.cueKind!=='nudge'&&S.cueKind!=='idle'&&now-S.cueAt<12000))showCue(item);
+  renderHistory();renderMeters();
+  if(kind==='objection'||kind==='signal')maybeAI('trigger',card);
+}
+function analyze(who,text){
+  const t=norm(text),marks=[];let ticked=false;
+  for(const c of CHECK)if(!S.checks.has(c.id)&&c.re.test(t)){S.checks.set(c.id,'heard');ticked=true;}
+  if(ticked)renderChecklist();
+  const scan=(list,kind,cls)=>{for(const card of list){const m=matchCard(card,t);if(m){marks.push({s:m[0].trim(),cls});fire(card,kind,text);}}};
+  if(who!=='me'){scan(SIGNALS,'signal','s');scan(PLAYBOOK,'objection','');}
+  if(who!=='prospect')scan(CAUTIONS,'caution','c');
+  return marks;
+}
+function hl(text,marks){
+  const low=text.toLowerCase().replace(/[‘’]/g,"'"),r=[];
+  for(const m of marks){if(m.s.length<3)continue;const i=low.indexOf(m.s);if(i>=0)r.push([i,i+m.s.length,m.cls]);}
+  r.sort((a,b)=>a[0]-b[0]);let out='',p=0;
+  for(const [a,b,c] of r){if(a<p)continue;out+=esc(text.slice(p,a))+'<mark'+(c?' class="'+c+'"':'')+'>'+esc(text.slice(a,b))+'</mark>';p=b;}
+  return out+esc(text.slice(p));
+}
+function countQ(text){const q=(text.match(/\?/g)||[]).length;if(q)return q;return /^\s*(what|how|when|who|where|why|which|do|does|did|are|is|can|could|would|will|have|has)\b/i.test(text)?1:0;}
+
+/* ---------- transcript ---------- */
+const tx=$('#tx');
+function nearBottom(){return tx.scrollHeight-tx.scrollTop-tx.clientHeight<80;}
+function onFinal(who,text){
+  text=(text||'').trim();if(!text)return;
+  const stick=nearBottom();$('#txEmpty')?.remove();
+  const now=Date.now(),last=S.lines[S.lines.length-1];
+  const marks=analyze(who,text);
+  let entry;
+  if(last&&last.who===who&&now-last.t<6000){entry=last;entry.text+=' '+text;entry.marks.push(...marks);entry.t=now;}
+  else{entry={who,text,marks,t:now,node:document.createElement('div')};entry.node.className='u '+who;S.lines.push(entry);
+    tx.insertBefore(entry.node,tx.querySelector('.interim'));}
+  entry.node.innerHTML='<span class="who">'+LABEL[who]+'</span><p>'+hl(entry.text,entry.marks)+'</p>';
+  S.words[who]+=text.split(/\s+/).length;
+  if(who==='me'){const q=countQ(text);if(q){S.questions+=q;S.lastQ=now;}}
+  if(who!=='me')S.aiChars+=text.length;
+  if(stick)tx.scrollTop=tx.scrollHeight;
+  renderMeters();
+}
+function onInterim(who,text){
+  let n=tx.querySelector('.interim.'+who);
+  if(!text){n?.remove();return;}
+  const stick=nearBottom();$('#txEmpty')?.remove();
+  if(!n){n=document.createElement('div');n.className='u interim '+who;tx.appendChild(n);}
+  n.innerHTML='<span class="who">'+LABEL[who]+'</span><p>'+esc(text)+'</p>';
+  analyze(who,text);
+  if(stick)tx.scrollTop=tx.scrollHeight;
+}
+
+/* ---------- side panel ---------- */
+function renderChecklist(){
+  $('#checklist').innerHTML=CHECK.map(c=>{const st=S.checks.get(c.id);
+    return '<li class="'+(st?'done':'')+'"><button data-id="'+c.id+'" aria-pressed="'+!!st+'">'+esc(c.label)+(st==='heard'?'<small>heard</small>':'')+'</button></li>';}).join('');
+}
+$('#checklist').onclick=e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.id;
+  if(S.checks.has(id))S.checks.delete(id);else S.checks.set(id,'manual');renderChecklist();};
+function renderMeters(){
+  const tot=S.words.me+S.words.prospect,me=tot?Math.round(S.words.me/tot*100):0;
+  $('#meters').innerHTML=[[S.questions,'Questions asked'],[S.raised.length,'Objections'],[S.signals,'Buying signals']]
+    .map(([v,l])=>'<div class="stat"><b>'+v+'</b><span>'+l+'</span></div>').join('');
+  $('#ratioBar').style.width=me+'%';
+  $('#ratioMe').textContent='You '+me+'%';$('#ratioPr').textContent='Prospect '+(tot?100-me:0)+'%';
+}
+function renderHistory(){
+  $('#history').innerHTML=S.hist.length?S.hist.slice(0,40).map((h,i)=>
+    '<li><button data-i="'+i+'"><span class="dot '+h.kind+'"></span>'+esc(h.card.title)+'<time>'+(S.t0?fmt(h.t-S.t0):'')+'</time></button></li>').join('')
+    :'<li class="small mute">Pointers from this call will stack up here.</li>';
+}
+$('#history').onclick=e=>{const b=e.target.closest('button');if(b)showCue(S.hist[+b.dataset.i]);};
+
+/* ---------- timer and nudges ---------- */
+setInterval(()=>{
+  if(!S.t0)return;
+  const el=(S.t1||Date.now())-S.t0;$('#timer').textContent=fmt(el);
+  if(!S.running&&!S.demo)return;
+  const me=S.words.me,pr=S.words.prospect;
+  if(me+pr>220&&me/(me+pr)>0.68)fire(NUDGES.talk,'nudge','');
+  if(me>60&&Date.now()-Math.max(S.lastQ,S.t0)>120000)fire(NUDGES.ask,'nudge','');
+  if(el>180000&&!S.checks.has('xdate'))fire(NUDGES.xdate,'nudge','');
+  if(aiReady()&&S.aiChars>280&&Date.now()-S.aiLast>25000)maybeAI('periodic');
+},1000);
+
+/* ---------- audio capture ---------- */
+async function getDialerAudio(){
+  let ds;
+  try{ds=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:'browser'},audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},systemAudio:'include',selfBrowserSurface:'exclude',surfaceSwitching:'include'});}
+  catch(e){throw new Error('Sharing was cancelled. Click Start listening again, pick your RingCentral tab, and turn on "Also share tab audio".');}
+  const a=ds.getAudioTracks()[0];
+  if(!a){ds.getTracks().forEach(t=>t.stop());throw new Error('No audio was shared. Click Start listening again and turn on "Also share tab audio" (or "Also share system audio" for a whole screen).');}
+  a.addEventListener('ended',()=>{if(S.running){note('RingCentral audio sharing stopped, so listening stopped.');stopListening();}});
+  S.streams.push(ds);startMeter(a);return a;
+}
+function startMeter(track){
+  try{
+    const ac=new AudioContext(),an=ac.createAnalyser();an.fftSize=512;
+    ac.createMediaStreamSource(new MediaStream([track])).connect(an);
+    const buf=new Uint8Array(an.fftSize),bar=$('#lvlBar'),t0=Date.now();let warned=false;
+    S.meter={ac};$('#lvl').hidden=false;
+    const loop=()=>{
+      if(!S.meter||S.meter.ac!==ac)return;
+      an.getByteTimeDomainData(buf);let pk=0;for(const v of buf)pk=Math.max(pk,Math.abs(v-128));
+      const lv=Math.min(1,pk/48);bar.style.width=Math.round(lv*100)+'%';
+      if(lv>0.05)S.heardAudio=true;
+      if(!warned&&!S.heardAudio&&!S.words.prospect&&Date.now()-t0>60000){warned=true;
+        note('No sound from the shared tab for a minute. If you\'re on a call, check that you shared the RingCentral tab with "Also share tab audio" turned on.');}
+      requestAnimationFrame(loop);
+    };loop();
+  }catch(e){}
+}
+function stopMeter(){if(S.meter){try{S.meter.ac.close();}catch(e){}S.meter=null;}$('#lvl').hidden=true;$('#lvlBar').style.width='0';}
+const ONE_ENGINE='Chrome could only run one speech engine at a time here, so Call Coach is listening to the prospect only. For both sides, switch to Deepgram in Settings.';
+function makeRec(who,track){
+  const r=new SR();r.continuous=true;r.interimResults=true;r.lang='en-US';
+  const h={who,alive:true,starts:[],stop(){h.alive=false;try{r.abort();}catch(e){}}};
+  h.go=()=>{
+    const now=Date.now();h.starts=h.starts.filter(t=>now-t<10000);h.starts.push(now);
+    if(h.starts.length>4)return thrash(h);
+    try{track?r.start(track):r.start();}catch(e){if(track&&track.readyState!=='live')h.alive=false;}
+  };
+  r.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)onFinal(who,x[0].transcript);else interim+=x[0].transcript;}onInterim(who,interim);};
+  r.onerror=e=>{
+    if(e.error==='no-speech'||e.error==='aborted')return;
+    if(['not-allowed','service-not-allowed','audio-capture'].includes(e.error)){h.alive=false;
+      note(who==='prospect'?'Chrome could not transcribe the RingCentral audio ('+e.error+'). Update Chrome, or switch to Deepgram in Settings.'
+        :'Chrome blocked the microphone. Click the icon at the left of the address bar, allow the microphone, and start again.');}
+    else if(e.error==='network')note('The speech engine lost its connection. Check your internet connection.');
+  };
+  r.onend=()=>{onInterim(who,'');if(S.running&&h.alive)setTimeout(()=>{if(S.running&&h.alive)h.go();},250);};
+  h.go();return h;
+}
+function thrash(h){
+  const me=S.engines.find(x=>x.who==='me'&&x.alive);
+  if(h.who==='me'){h.stop();note(ONE_ENGINE);return;}
+  if(me){me.stop();note(ONE_ENGINE);h.starts=[];setTimeout(()=>{if(S.running&&h.alive)h.go();},400);return;}
+  h.alive=false;note('The speech engine keeps stopping. Try stopping and starting again, or switch to Deepgram in Settings.');
+}
+function dgSocket(who,track){
+  const p=new URLSearchParams({model:'nova-3',language:'en-US',smart_format:'true',interim_results:'true',endpointing:'300'});
+  KEYTERMS.forEach(k=>p.append('keyterm',k));
+  const ws=new WebSocket('wss://api.deepgram.com/v1/listen?'+p,['token',cfg.dgKey]);
+  let rec,ka;const h={who,alive:true};
+  ws.onopen=()=>{
+    rec=new MediaRecorder(new MediaStream([track]),{mimeType:'audio/webm;codecs=opus'});
+    rec.ondataavailable=e=>{if(e.data.size&&ws.readyState===1)ws.send(e.data);};
+    rec.start(250);
+    ka=setInterval(()=>{if(ws.readyState===1)ws.send(JSON.stringify({type:'KeepAlive'}));},8000);
+  };
+  ws.onmessage=m=>{let d;try{d=JSON.parse(m.data);}catch(e){return;}
+    if(d.type!=='Results')return;const txt=d.channel?.alternatives?.[0]?.transcript||'';
+    if(d.is_final){onInterim(who,'');if(txt)onFinal(who,txt);}else onInterim(who,txt);};
+  ws.onerror=()=>note('Could not connect to Deepgram. Check your API key in Settings.');
+  ws.onclose=e=>{clearInterval(ka);if(S.running&&h.alive&&e.code!==1000)note('Deepgram disconnected ('+e.code+'). '+(e.reason||'Check your key and balance.'));};
+  h.stop=()=>{h.alive=false;clearInterval(ka);try{if(rec&&rec.state!=='inactive')rec.stop();}catch(e){}
+    try{if(ws.readyState===1)ws.send(JSON.stringify({type:'CloseStream'}));}catch(e){}setTimeout(()=>{try{ws.close(1000);}catch(e){}},600);};
+  return h;
+}
+
+/* ---------- start / stop ---------- */
+function setStatus(on,label){const s=$('#status');s.classList.toggle('on',on);s.textContent=label||(on?'Listening':'Idle');
+  const b=$('#startBtn');b.textContent=S.running?'Stop listening':'Start listening';b.className=S.running?'live':'primary';
+  $('#demoBtn').textContent=S.demo?'Stop demo':'Run demo call';}
+async function start(){
+  if(S.running){stopListening();return;}
+  if(S.demo)stopDemo();
+  const consent=$('#consent').checked;
+  reset();$('#notice').hidden=true;
+  S.running=true;S.t0=Date.now();setStatus(true,'Starting…');
+  try{
+    if(cfg.engine==='deepgram'){
+      if(!cfg.dgKey)throw new Error('Add your Deepgram API key in Settings first, or switch to the free Chrome engine.');
+      if(!window.MediaRecorder)throw new Error('This browser can\'t stream audio. Use Google Chrome.');
+      const track=await getDialerAudio();
+      const mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}}).catch(()=>{throw new Error('Chrome blocked the microphone. Allow it from the address bar and try again.');});
+      S.streams.push(mic);
+      S.engines.push(dgSocket('prospect',track),dgSocket('me',mic.getAudioTracks()[0]));
+    }else{
+      if(!SR)throw new Error('Live listening needs Google Chrome. Practice and demo modes still work here.');
+      if(cfg.listen!=='mic')S.engines.push(makeRec('prospect',await getDialerAudio()));
+      if(cfg.listen!=='prospect')S.engines.push(makeRec(cfg.listen==='mic'?'call':'me',null));
+    }
+  }catch(e){stopListening();S.t0=0;$('#timer').textContent='0:00';note(e.message);return;}
+  S.t0=Date.now();setStatus(true);
+  if(!consent&&!cfg.rcAnnounce)note('Reminder: tell the caller the call is being transcribed, and tick the box once they agree. Florida and several other states require everyone on a call to consent.');
+}
+function stopListening(){
+  const was=S.running;S.running=false;
+  S.engines.forEach(h=>{try{h.stop();}catch(e){}});S.engines=[];
+  S.streams.forEach(s=>s.getTracks().forEach(t=>t.stop()));S.streams=[];stopMeter();
+  tx.querySelectorAll('.interim').forEach(n=>n.remove());
+  if(was&&S.t0)S.t1=Date.now();
+  setStatus(false);
+}
+function runDemo(){
+  if(S.demo){stopDemo();return;}
+  if(S.running)stopListening();
+  reset();S.demo=true;S.t0=Date.now();setStatus(true,'Demo call (sample business)');
+  let i=0;
+  const step=()=>{
+    if(!S.demo)return;
+    if(i>=DEMO.length){stopDemo();return;}
+    const [who,text]=DEMO[i++],w=text.split(' ');
+    onInterim(who,w.slice(0,Math.ceil(w.length*.55)).join(' '));
+    S.demoT=setTimeout(()=>{onInterim(who,'');onFinal(who,text);S.demoT=setTimeout(step,1900);},1000);
+  };
+  step();
+}
+function stopDemo(){clearTimeout(S.demoT);S.demo=false;S.t1=Date.now();tx.querySelectorAll('.interim').forEach(n=>n.remove());setStatus(false);}
+
+/* ---------- AI coach ---------- */
+const COACH_SYS='You are a live sales coach for a commercial property and casualty insurance agent, giving whispered pointers during a phone call. The transcript is machine-generated and may contain errors. Reply with JSON only: {"headline":"max 8 words","say":"one natural sentence the agent could say next, max 30 words","ask":"one open question, max 20 words","caution":"a compliance or E&O watch-out, or empty string"}. Base it on what the prospect actually said. Never suggest promising coverage, claim payment, or price before underwriting, and never suggest misstating anything on an application.';
+const NOTES_SYS='You write CRM call notes for a commercial P&C insurance agent from a machine transcript and call stats. Plain text, these sections: Summary (2-3 sentences); Prospect details captured (bullets); Objections and how they were handled; Missing information to collect; Next steps (with dates only if stated); Follow-up email the agent can send (short, friendly). Do not invent facts; write "not captured" for unknowns. The email must not promise coverage or pricing.';
+async function claude(system,user,max){
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+    headers:{'content-type':'application/json','x-api-key':cfg.antKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:cfg.model||DEF.model,max_tokens:max,system,messages:[{role:'user',content:user}]})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error?.message||('HTTP '+r.status));
+  return (j.content||[]).map(c=>c.text||'').join('').trim();
+}
+async function maybeAI(reason,card){
+  if(!aiReady()||S.aiBusy)return;
+  if(reason==='trigger'&&Date.now()-S.aiLast<8000)return;
+  S.aiBusy=true;S.aiLast=Date.now();S.aiChars=0;
+  $('#aiBox').hidden=false;$('#aiState').textContent='Thinking…';
+  const convo=S.lines.slice(-24).map(l=>LABEL[l.who]+': '+l.text).join('\n')||'(no transcript yet)';
+  const miss=CHECK.filter(c=>!S.checks.has(c.id)).map(c=>c.label).join(', ')||'none';
+  const user='Transcript so far, most recent last:\n'+convo+'\n\n'+(card?'Just detected: '+card.title+'\n':'')+'Discovery topics not covered yet: '+miss+'\n\nGive one pointer for right now.';
+  try{
+    const out=await claude(COACH_SYS,user,300);let o;
+    try{o=JSON.parse((out.match(/\{[\s\S]*\}/)||[''])[0]);}catch(e){o={headline:'',say:out};}
+    $('#aiHead').textContent=o.headline||'';$('#aiSay').textContent=o.say||'';
+    $('#aiAsk').textContent=o.ask?'Ask: '+o.ask:'';$('#aiCaution').textContent=o.caution?'Watch out: '+o.caution:'';
+    $('#aiState').textContent='updated '+(S.t0?fmt(Date.now()-S.t0):'now');
+  }catch(e){$('#aiState').textContent='';$('#aiHead').textContent='AI coach error';$('#aiSay').textContent=e.message;}
+  finally{S.aiBusy=false;}
+}
+$('#aiNow').onclick=()=>{S.aiLast=0;maybeAI('manual');};
+
+/* ---------- summary ---------- */
+function summaryText(){
+  const el=S.t0?(S.t1||Date.now())-S.t0:0,tot=S.words.me+S.words.prospect;
+  const done=CHECK.filter(c=>S.checks.has(c.id)).map(c=>c.label),miss=CHECK.filter(c=>!S.checks.has(c.id)).map(c=>c.label);
+  const L=['Call summary, '+new Date().toLocaleString(),'Length: '+fmt(el)];
+  if(tot)L.push('Talk time: you '+Math.round(S.words.me/tot*100)+'%, prospect '+Math.round(S.words.prospect/tot*100)+'%');
+  L.push('Questions you asked: '+S.questions,'Caller disclosure: '+(cfg.rcAnnounce?'RingCentral AI announcement':($('#consent').checked?'agreed':'not marked')),
+    'Objections: '+(S.raised.join('; ')||'none detected'),'Buying signals: '+(S.signals||'none detected'),
+    'Discovery covered: '+(done.join(', ')||'none'),'Still missing: '+(miss.join(', ')||'nothing'));
+  if(S.flags.length)L.push('Compliance flags:\n- '+S.flags.join('\n- '));
+  L.push('','Transcript:');S.lines.forEach(l=>L.push(LABEL[l.who]+': '+l.text));
+  return L.join('\n');
+}
+$('#endBtn').onclick=()=>{
+  if(S.running)stopListening();if(S.demo)stopDemo();
+  $('#sumText').value=summaryText();$('#aiNotes').hidden=true;
+  $('#aiNotesBtn').hidden=!aiReady();$('#copyBtn').textContent='Copy';
+  $('#sumDlg').showModal();
+};
+$('#aiNotesBtn').onclick=async()=>{
+  const n=$('#aiNotes');n.hidden=false;n.textContent='Writing call notes…';
+  try{n.textContent=await claude(NOTES_SYS,$('#sumText').value,1200);}catch(e){n.textContent='AI error: '+e.message;}
+};
+$('#copyBtn').onclick=async()=>{
+  const n=$('#aiNotes'),txt=(n.hidden?'':n.textContent+'\n\n')+$('#sumText').value;
+  try{await navigator.clipboard.writeText(txt);$('#copyBtn').textContent='Copied';}
+  catch(e){$('#sumText').select();$('#copyBtn').textContent='Press Ctrl+C';}
+};
+$('#sumClose').onclick=()=>{$('#sumDlg').close();$('#consent').checked=false;};
+
+/* ---------- settings ---------- */
+const setDlg=$('#settings');
+$('#settingsBtn').onclick=()=>{
+  setDlg.querySelectorAll('input[name=engine]').forEach(r=>r.checked=r.value===cfg.engine);
+  $('#listen').value=cfg.listen;$('#dgKey').value=cfg.dgKey;$('#antKey').value=cfg.antKey;
+  $('#model').value=cfg.model;$('#aiOn').checked=cfg.aiOn;$('#remember').checked=cfg.remember;$('#rcAnnounce').checked=cfg.rcAnnounce;
+  setDlg.showModal();
+};
+setDlg.addEventListener('close',()=>{
+  if(setDlg.returnValue!=='save')return;
+  cfg={engine:setDlg.querySelector('input[name=engine]:checked')?.value||'chrome',listen:$('#listen').value,
+    dgKey:$('#dgKey').value.trim(),antKey:$('#antKey').value.trim(),model:$('#model').value.trim()||DEF.model,
+    aiOn:$('#aiOn').checked,remember:$('#remember').checked,rcAnnounce:$('#rcAnnounce').checked,myName:cfg.myName||''};
+  saveCfg();applyDisclosure();if(!S.running&&S.cueKind==='idle')idleCue();else $('#aiBox').hidden=!aiReady();
+});
+
+/* ---------- practice ---------- */
+$('#practice').addEventListener('submit',e=>{
+  e.preventDefault();const v=$('#pText').value.trim();if(!v)return;
+  if(!S.t0)S.t0=Date.now();
+  onFinal($('#pWho').value,v);$('#pText').value='';
+});
+
+function applyDisclosure(){$('#rcNote').hidden=!cfg.rcAnnounce;$('#consentBox').hidden=!!cfg.rcAnnounce;}
+applyDisclosure();
+$('#ver').textContent='v'+APP_VERSION;
+if(/^https?:/.test(location.protocol)){
+  const checkUpdate=async()=>{try{const r=await fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'});const m=(await r.text()).match(/const APP_VERSION='(\d+)'/);
+    if(m&&+m[1]>+APP_VERSION)$('#upd').hidden=false;}catch(e){}};
+  setInterval(checkUpdate,5*60*1000);setTimeout(checkUpdate,20000);
+  $('#updBtn').onclick=()=>{if(S.running&&!window.confirm('You are still listening to a call. Reload anyway?'))return;location.reload();};
+}
+$('#startBtn').onclick=start;
+$('#demoBtn').onclick=runDemo;
+reset();
+if(!SR)note('Open this file in Google Chrome for live listening. The demo and practice modes work in any browser.');
+}
+</script>
+</body>
+</html>
