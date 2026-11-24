@@ -1,5 +1,9 @@
 # Changelog
 
+## v7 — Nov 23, 2026
+- **Quick objection** box at the top: type what the prospect said and press Enter for 3 pointers (what to say plus a follow-up question). Uses Claude when an Anthropic key is in Settings, grounded in your playbook, saved real replies and the live transcript; otherwise shows the closest playbook matches.
+- Press / anywhere to jump to the box; Esc clears it. Typed objections appear in Earlier pointers and in the call summary.
+
 ## v6 — Nov 23, 2026
 - Reads RingCentral AI transcript downloads (the `Name | Date Time` layout).
 - Learned from a real call: new objection "My buddy pays less", new buying signal "wants to lock in a start date", new caution for sharing another client's price or policy details.

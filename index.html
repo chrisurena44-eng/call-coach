@@ -44,6 +44,20 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .ver{font:500 13px/1 Inter,sans-serif;color:var(--mute);vertical-align:middle;margin-left:4px}
 .upd{margin:12px max(3vw,14px) 0;padding:10px 10px 10px 16px;border-radius:12px;background:var(--blueSoft);display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
 .upd p{margin:0}
+.quick{margin:14px max(3vw,14px) 0;display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 10px 10px 16px}
+.quick label{font:600 16px "Space Grotesk",Inter,sans-serif;white-space:nowrap}
+.quick input{flex:1 1 260px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--bg)}
+.qres{margin:10px max(3vw,14px) 0;padding:16px;border-radius:14px;background:var(--card);border:1px solid var(--blue)}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
+.qhead b{font-size:17px}
+.qhead span{margin-right:auto}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;margin-top:12px}
+.qp{background:var(--bg);border-radius:12px;padding:14px 16px}
+.qp .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--blue);color:var(--card);font:600 14px Inter,sans-serif}
+.qp h3{margin:8px 0 6px;font-size:19px;line-height:1.2}
+.qp p{margin:0 0 6px;font-size:17px;line-height:1.4}
+.qp .qask{color:var(--mute);font-size:15px}
+.qcau{margin:10px 0 0;color:var(--amber);font-size:14px}
 .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .timer{font:500 22px/1 "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;min-width:64px;text-align:right;white-space:nowrap}
 .notice{margin:12px max(3vw,14px) 0;padding:10px 10px 10px 16px;border-radius:12px;background:var(--amberSoft);display:flex;gap:12px;justify-content:space-between;align-items:center}
@@ -172,6 +186,16 @@ details ol{margin:8px 0 0;padding-left:20px}
   </div>
 </header>
 
+<form class="quick" id="quick" autocomplete="off">
+  <label for="qText">Quick objection</label>
+  <input id="qText" placeholder="Type what they said, e.g. &quot;we're locked into a 3-year deal&quot; (press / to jump here)">
+  <button class="primary">Get 3 pointers</button>
+</form>
+<section class="qres" id="qres" hidden aria-live="polite">
+  <div class="qhead"><b id="qTitle"></b><span class="small mute" id="qSrc"></span><button id="qClose" type="button">Close</button></div>
+  <div class="qgrid" id="qGrid"></div>
+  <p class="qcau" id="qCau" hidden></p>
+</section>
 <div id="upd" class="upd" hidden><p>A new version of Call Coach is ready. Reload when you're between calls.</p><button id="updBtn" class="primary">Reload now</button></div>
 <div id="notice" class="notice" hidden><p id="noticeText"></p><button id="noticeX">Dismiss</button></div>
 
@@ -234,7 +258,7 @@ details ol{margin:8px 0 0;padding-left:20px}
     </fieldset>
     <fieldset>
       <legend>AI coach (optional)</legend>
-      <label class="opt"><input type="checkbox" id="aiOn"><span><b>Turn on Claude coaching</b><span class="small mute">Reads the last few minutes and suggests the next line. Uses your Anthropic API key.</span></span></label>
+      <label class="opt"><input type="checkbox" id="aiOn"><span><b>Turn on Claude coaching</b><span class="small mute">Reads the last few minutes and suggests the next line. Uses your Anthropic API key, which also powers Quick objection.</span></span></label>
       <label class="field"><span class="small">Anthropic API key</span><input type="password" id="antKey" autocomplete="off"></label>
       <label class="field"><span class="small">Model</span><input type="text" id="model" autocomplete="off"></label>
     </fieldset>
@@ -602,7 +626,7 @@ const KEYTERMS=['bond','Sunbiz','dealer license','effective date','garage liabil
 <script>
 {
 const $=s=>document.querySelector(s);
-const APP_VERSION='6';
+const APP_VERSION='7';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL={me:'You',prospect:'Prospect',call:'Call'};
 const TAG={objection:'Objection',signal:'Buying signal',caution:'Careful',nudge:'Coaching'};
@@ -835,7 +859,7 @@ let S;
 function reset(){
   if(S&&S.demoT)clearTimeout(S.demoT);
   S={running:false,demo:false,t0:0,t1:0,lines:[],fired:{},words:{me:0,prospect:0,call:0},questions:0,lastQ:0,
-     raised:[],signals:0,flags:[],checks:new Map(),hist:[],cueKind:'idle',cueAt:0,aiLast:0,aiBusy:false,aiChars:0,engines:[],streams:[],demoT:0};
+     raised:[],signals:0,flags:[],typed:[],checks:new Map(),hist:[],cueKind:'idle',cueAt:0,aiLast:0,aiBusy:false,aiChars:0,engines:[],streams:[],demoT:0};
   $('#tx').innerHTML='<p class="empty" id="txEmpty">Nothing yet. Start listening, run the demo call, or type a practice line below.</p>';
   $('#timer').textContent='0:00';
   renderChecklist();renderHistory();renderMeters();idleCue();
@@ -1125,7 +1149,7 @@ function summaryText(){
   const L=['Call summary, '+new Date().toLocaleString(),'Length: '+fmt(el)];
   if(tot)L.push('Talk time: you '+Math.round(S.words.me/tot*100)+'%, prospect '+Math.round(S.words.prospect/tot*100)+'%');
   L.push('Questions you asked: '+S.questions,'Caller disclosure: '+(cfg.rcAnnounce?'RingCentral AI announcement':($('#consent').checked?'agreed':'not marked')),
-    'Objections: '+(S.raised.join('; ')||'none detected'),'Buying signals: '+(S.signals||'none detected'),
+    'Objections: '+(S.raised.join('; ')||'none detected'),'Objections you typed: '+(S.typed.join('; ')||'none'),'Buying signals: '+(S.signals||'none detected'),
     'Discovery covered: '+(done.join(', ')||'none'),'Still missing: '+(miss.join(', ')||'nothing'));
   if(S.flags.length)L.push('Compliance flags:\n- '+S.flags.join('\n- '));
   L.push('','Transcript:');S.lines.forEach(l=>L.push(LABEL[l.who]+': '+l.text));
@@ -1162,6 +1186,59 @@ setDlg.addEventListener('close',()=>{
     dgKey:$('#dgKey').value.trim(),antKey:$('#antKey').value.trim(),model:$('#model').value.trim()||DEF.model,
     aiOn:$('#aiOn').checked,remember:$('#remember').checked,rcAnnounce:$('#rcAnnounce').checked,myName:cfg.myName||''};
   saveCfg();applyDisclosure();if(!S.running&&S.cueKind==='idle')idleCue();else $('#aiBox').hidden=!aiReady();
+});
+
+/* ---------- quick objection: type it, get 3 pointers ---------- */
+const QUICK_SYS='You coach a commercial property and casualty insurance agent who is on a live sales call. The agent typed an objection the prospect just raised. Reply with JSON only: {"pointers":[{"title":"2-5 words","say":"one sentence the agent can say right now, max 28 words, plain-spoken","ask":"one follow-up question, max 16 words"}],"caution":"one compliance or E&O watch-out, or empty string"}. Give exactly 3 pointers, each a different approach (for example: acknowledge and reframe, uncover the real concern, propose a concrete next step). Use the playbook notes and the agent\'s own past replies when they fit. Never promise coverage, claim payment, or a price before underwriting; never suggest misstating application facts or sharing another client\'s details. The transcript may contain transcription errors.';
+const STOP=new Set('that this with have just they what your from them were were there their would about been want really dont doesn didn into than then when also only even some much more like just yeah okay'.split(' '));
+function localPointers(text){
+  const t=norm(text);let cards=[...PLAYBOOK,...SIGNALS].filter(c=>matchCard(c,t));
+  if(cards.length<3){
+    const words=t.trim().split(' ').filter(w=>w.length>3&&!STOP.has(w.replace(/'/g,'')));
+    const more=PLAYBOOK.filter(c=>!cards.includes(c)).map(c=>{const hay=norm(c.title+' '+(c.why||'')+' '+(L.triggers[c.id]||[]).join(' '));
+      return [words.filter(w=>hay.includes(' '+w)).length,c];}).filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]).map(x=>x[1]);
+    cards=[...cards,...more];
+  }
+  const ps=cards.slice(0,3).map(c=>({title:c.title,say:c.say||'',ask:c.ask||'',card:c}));
+  const ex=ps[0]&&bestExample(ps[0].card.id);
+  if(ex&&ps.length<3)ps.push({title:ex.outcome==='won'?'What worked before':'What you said before',say:'"'+clip(ex.reply,200)+'"',ask:''});
+  return ps;
+}
+function renderQuick(text,ps,src,caution){
+  $('#qres').hidden=false;$('#qTitle').textContent='"'+clip(text,90)+'"';$('#qSrc').textContent=src;
+  $('#qGrid').innerHTML=ps.length?ps.map((p,i)=>'<article class="qp"><span class="n">'+(i+1)+'</span><h3>'+esc(p.title||'')+'</h3><p>'+esc(p.say||'')+'</p>'+(p.ask?'<p class="qask">Ask: '+esc(p.ask)+'</p>':'')+'</article>').join('')
+    :'<p class="mute" style="margin:0">Nothing in your playbook matches yet. Add an Anthropic API key in Settings to get AI pointers for any objection.</p>';
+  $('#qCau').hidden=!caution;$('#qCau').textContent=caution?'Watch out: '+caution:'';
+}
+function logQuick(text,p,caution){
+  if(!p)return;
+  S.hist.unshift({card:{id:'q'+Date.now(),title:'Typed: "'+clip(text,48)+'"',why:'You typed this objection.',say:p.say||'',ask:p.ask||'',avoid:caution||''},kind:'objection',quote:text,t:Date.now()});
+  renderHistory();
+}
+let qSeq=0;
+$('#quick').addEventListener('submit',async e=>{
+  e.preventDefault();const text=$('#qText').value.trim();if(!text)return;
+  const seq=++qSeq,local=localPointers(text),c0=local[0]&&local[0].card;
+  S.typed.push(text);
+  renderQuick(text,local,cfg.antKey?'From your playbook · Claude is thinking…':'From your playbook · add an Anthropic key in Settings for AI pointers',c0?c0.avoid:'');
+  if(!cfg.antKey){logQuick(text,local[0],c0&&c0.avoid);return;}
+  const cards=local.filter(p=>p.card).map(p=>p.card);
+  const notes=cards.map(c=>'- '+c.title+': say "'+c.say+'"; ask "'+c.ask+'"; avoid "'+c.avoid+'"').join('\n');
+  const exs=cards.flatMap(c=>((L.examples||{})[c.id]||[]).slice(0,2).map(x=>'- ['+x.outcome+'] "'+x.reply+'"')).join('\n');
+  const convo=S.lines.slice(-12).map(l=>LABEL[l.who]+': '+l.text).join('\n');
+  const user='Objection the prospect raised: "'+text+'"\n\n'+(notes?'Playbook notes:\n'+notes+'\n\n':'')+(exs?'What this agent has said on real calls:\n'+exs+'\n\n':'')+(convo?'Recent call transcript:\n'+convo:'No live transcript.');
+  try{
+    const out=await claude(QUICK_SYS,user,600);if(seq!==qSeq)return;
+    const o=JSON.parse((out.match(/\{[\s\S]*\}/)||['{}'])[0]),ps=(o.pointers||[]).slice(0,3);
+    if(!ps.length)throw new Error('no pointers came back');
+    renderQuick(text,ps,'From Claude',o.caution||'');logQuick(text,ps[0],o.caution);
+  }catch(err){if(seq!==qSeq)return;$('#qSrc').textContent='From your playbook · Claude error: '+err.message;logQuick(text,local[0],c0&&c0.avoid);}
+});
+$('#qClose').onclick=()=>{$('#qres').hidden=true;};
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement&&document.activeElement.tagName;
+  if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(tag)&&!document.querySelector('dialog[open]')){e.preventDefault();$('#qText').focus();$('#qText').select();}
+  else if(e.key==='Escape'&&document.activeElement===$('#qText')){$('#qres').hidden=true;$('#qText').value='';}
 });
 
 /* ---------- practice ---------- */
