@@ -1,5 +1,9 @@
 # Changelog
 
+## v13 — Nov 23, 2026
+- Phone-friendly: on a phone the site opens on Quick objection, and the live-call buttons are hidden there on small screens so the objection box sits at the top (Settings stays).
+- Tapping Start listening on a phone explains that live listening needs Chrome on a computer.
+
 ## v12 — Nov 23, 2026
 - Your Manus AI service address is built in, so connecting the AI only takes the passcode.
 

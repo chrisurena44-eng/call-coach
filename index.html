@@ -44,6 +44,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .ver{font:500 13px/1 Inter,sans-serif;color:var(--mute);vertical-align:middle;margin-left:4px}
 .upd{margin:12px max(3vw,14px) 0;padding:10px 10px 10px 16px;border-radius:12px;background:var(--blueSoft);display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
 .upd p{margin:0}
+@media(max-width:700px){body.vq .controls>:not(#settingsBtn){display:none}body.vq .bar{padding-block:10px}body.vq .brand h1{font-size:20px}}
 .tabs{display:flex;gap:4px;padding:6px max(3vw,14px) 0;border-bottom:1px solid var(--line);overflow-x:auto}
 .tabs a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;color:var(--mute);font-weight:600;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
 .tabs a:hover{color:var(--ink)}
@@ -718,7 +719,7 @@ const KEYTERMS=['bond','Sunbiz','dealer license','effective date','garage liabil
 <script>
 {
 const $=s=>document.querySelector(s);
-const APP_VERSION='12';
+const APP_VERSION='13';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL={me:'You',prospect:'Prospect',call:'Call'};
 const TAG={objection:'Objection',signal:'Buying signal',caution:'Careful',nudge:'Coaching'};
@@ -1177,6 +1178,7 @@ async function start(){
       S.engines.push(dgSocket('prospect',track),dgSocket('me',mic.getAudioTracks()[0]));
     }else{
       if(!SR)throw new Error('Live listening needs Google Chrome. Practice and demo modes still work here.');
+      if(!CAN_SHARE&&cfg.listen!=='mic')throw new Error('Live listening needs Chrome on a computer, next to RingCentral. On your phone, use the Quick objection tab.');
       if(cfg.listen!=='mic')S.engines.push(makeRec('prospect',await getDialerAudio()));
       if(cfg.listen!=='prospect')S.engines.push(makeRec(cfg.listen==='mic'?'call':'me',null));
     }
@@ -1407,8 +1409,11 @@ if(cfg.qBiz||cfg.qCov)$('#qCtx').open=true;
 renderRecent();
 
 /* ---------- sections: Live call / Quick objection ---------- */
+const CAN_SHARE=!!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia);
+if(!location.hash&&!CAN_SHARE)history.replaceState(null,'','#quick');
 function route(){
   const q=location.hash==='#quick';
+  document.body.classList.toggle('vq',q);
   $('#viewQuick').hidden=!q;$('#viewLive').hidden=q;
   $('#tabQuick').setAttribute('aria-current',q?'page':'false');$('#tabLive').setAttribute('aria-current',q?'false':'page');
   if(q)setTimeout(()=>$('#qText').focus(),0);

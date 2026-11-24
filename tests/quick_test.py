@@ -66,5 +66,14 @@ async def main():
         print('ANTHROPIC FALLBACK OK:',(await pg.locator('#qGrid h3').all_text_contents())[0])
         await pg.click('#tabLive'); await pg.wait_for_timeout(150); assert await pg.is_visible('#viewLive')
         print('ERRORS:',errs); assert not errs
+        # Phone: no screen sharing -> opens on Quick objection, live buttons hidden there, clear message on Start listening
+        ph=await b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True)
+        await ph.add_init_script("Object.defineProperty(MediaDevices.prototype,'getDisplayMedia',{value:undefined,configurable:true})")
+        pp=await ph.new_page(); await pp.goto(URL); await pp.wait_for_timeout(200)
+        assert await pp.is_visible('#viewQuick') and not await pp.is_visible('#startBtn') and await pp.is_visible('#settingsBtn')
+        await pp.click('#tabLive'); await pp.wait_for_timeout(150); assert await pp.is_visible('#startBtn')
+        await pp.click('#startBtn'); await pp.wait_for_timeout(200)
+        msg=await pp.text_content('#noticeText'); assert 'Chrome on a computer' in msg, msg
+        print('PHONE OK:',msg)
         await b.close()
 asyncio.run(main())
