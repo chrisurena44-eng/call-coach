@@ -1,5 +1,10 @@
 # Changelog
 
+## v8 — Nov 23, 2026
+- Quick objection now stays on the objection you typed: it picks the single best-matching objection, shows "Matched objection", and all 3 pointers address it (acknowledge and reframe, find the real concern, set the next step or what worked before).
+- Every objection and buying signal has a new next-step line.
+- Claude gets only that objection's notes and your past replies to it, is told all 3 pointers must answer that exact objection, and runs at a lower temperature for focus.
+
 ## v7 — Nov 23, 2026
 - **Quick objection** box at the top: type what the prospect said and press Enter for 3 pointers (what to say plus a follow-up question). Uses Claude when an Anthropic key is in Settings, grounded in your playbook, saved real replies and the live transcript; otherwise shows the closest playbook matches.
 - Press / anywhere to jump to the box; Esc clears it. Typed objections appear in Earlier pointers and in the call summary.
