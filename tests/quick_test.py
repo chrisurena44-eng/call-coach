@@ -42,6 +42,7 @@ async def main():
         assert 'exactly as typed: "we\'re locked into a 3-year deal with our carrier"' in body['user']
         assert 'used car dealer' in body['user'] and 'Surety / dealer bond' in body['user'] and 'renews in March' in body['user']
         assert 'All three pointers must address this objection' in body['system']
+        assert 'we never email, text or send quotes' in body['system'] and 'Every set must end by asking for the sale' in body['system']
         titles=await pg.locator('#qGrid h3').all_text_contents(); assert len(titles)==3 and titles[0].endswith('1'), titles
         print('MANUS OK:',titles,'|',await pg.text_content('#qSrc'))
         await pg.click('#qMore'); await pg.wait_for_timeout(500)

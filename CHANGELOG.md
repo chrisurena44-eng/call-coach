@@ -1,5 +1,11 @@
 # Changelog
 
+## v15 — Nov 24, 2026
+- Pushier: Claude's pointers and the live coach use assertive, assumptive and either/or closes, and every set ends by asking for the sale or a hard next step with a time.
+- Agency rule built in: never email, text or send quotes or written price comparisons. Quotes are presented live and closed on the call. Claude steers "just email me the quote" to a live walkthrough now or at a set time.
+- "Just email me the quote" card rewritten; talk tracks that offered to send numbers or comparisons now present them live on the phone; closes tightened throughout.
+- AI follow-up emails in call notes never include quote amounts; they book a live review instead.
+
 ## v14 — Nov 23, 2026
 - Pointers sound like a producer on the phone: Claude now writes three short lines to say out loud (Disarm, Dig deeper, Close) that push for a next step, with no coverage lectures unless the prospect asked about coverage, no canned phrases, and the same compliance limits.
 - Every built-in talk track (all objections and buying signals) rewritten in the same sales voice.

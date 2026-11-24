@@ -23,3 +23,4 @@ The whole app is `index.html` (one self-contained page). GitHub Pages serves `ma
 - Never put API keys, passcodes, transcripts or client data in this repository.
 - Be conservative with the user's Manus credits: only send Manus tasks when needed, on the cheapest setting that works.
 - Talk tracks must not promise coverage, claim payment or price, or encourage misstating application facts.
+- Sales style: assertive closer, short spoken lines, every set ends asking for the sale or a hard next step. Agency rule: never email/text/send quotes or written price comparisons; quotes are presented live and closed on the call (asking the prospect for their dec page, loss runs or a competitor's quote is fine).
