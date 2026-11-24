@@ -1,5 +1,10 @@
 # Changelog
 
+## v11 — Nov 23, 2026
+- AI can now run through your own **Manus AI service** (Manus's built-in Claude), so no Anthropic API key is needed. Paste the service address and passcode in Quick objection's setup box or in Settings; they're saved only in your browser.
+- All AI features use the same connection: Quick objection, the live coach, Analyze with Claude, and AI call notes. An Anthropic key still works as a fallback.
+- Clear messages for a wrong passcode, the hourly limit, or an unreachable service.
+
 ## v10 — Nov 23, 2026
 - API key help now points to the Claude Console at platform.claude.com/settings/keys.
 

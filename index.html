@@ -275,9 +275,14 @@ details ol{margin:8px 0 0;padding-left:20px}
       </div>
     </details>
     <div class="qkey" id="qKey" hidden>
-      <p><b>Turn on AI pointers.</b> Quick objection uses Claude to write pointers for the exact objection. Paste your Claude API key. Make one at platform.claude.com/settings/keys (Claude Console, API keys page). API usage is billed through the Console, separately from your Claude plan; Max, Ultra and Team plans include monthly API credits.</p>
-      <div class="row"><input type="password" id="qKeyIn" autocomplete="off" aria-label="Anthropic API key" placeholder="sk-ant-..."><button class="primary" id="qKeySave" type="button">Save and get pointers</button></div>
-      <label class="opt small"><input type="checkbox" id="qKeyRemember" checked><span>Remember the key in this browser</span></label>
+      <p><b>Connect the AI.</b> Paste the passcode Manus gave you for the Call Coach AI service. It's saved only in this browser.</p>
+      <div class="row"><input type="password" id="qPassIn" autocomplete="off" aria-label="Manus service passcode" placeholder="Manus passcode"><button class="primary" id="qKeySave" type="button">Save and get pointers</button></div>
+      <label class="field" id="qUrlRow"><span class="small">Manus service address</span><input type="text" id="qUrlIn" autocomplete="off" placeholder="https://….manus.space"></label>
+      <details><summary class="small">Use an Anthropic API key instead</summary>
+        <div class="row" style="margin-top:8px"><input type="password" id="qKeyIn" autocomplete="off" aria-label="Anthropic API key" placeholder="sk-ant-..."></div>
+        <p class="small mute" style="margin-top:6px">Make one at platform.claude.com/settings/keys. Billed through the Claude Console.</p>
+      </details>
+      <label class="opt small"><input type="checkbox" id="qKeyRemember" checked><span>Remember this in this browser</span></label>
     </div>
     <div class="qout" id="qOut" hidden aria-live="polite">
       <p class="qread" id="qRead"></p>
@@ -311,8 +316,10 @@ details ol{margin:8px 0 0;padding-left:20px}
     </fieldset>
     <fieldset>
       <legend>AI coach (optional)</legend>
-      <label class="opt"><input type="checkbox" id="aiOn"><span><b>Turn on Claude coaching</b><span class="small mute">Reads the last few minutes and suggests the next line. Uses your Anthropic API key, which also powers Quick objection.</span></span></label>
-      <label class="field"><span class="small">Anthropic API key</span><input type="password" id="antKey" autocomplete="off"></label>
+      <label class="opt"><input type="checkbox" id="aiOn"><span><b>Turn on Claude coaching</b><span class="small mute">Reads the last few minutes and suggests the next line during live calls. Quick objection, transcript analysis and call notes use the same AI connection.</span></span></label>
+      <label class="field"><span class="small">Manus AI service address</span><input type="text" id="mUrl" autocomplete="off" placeholder="https://….manus.space"></label>
+      <label class="field"><span class="small">Manus service passcode</span><input type="password" id="mPass" autocomplete="off"></label>
+      <label class="field"><span class="small">Or an Anthropic API key (used only if no Manus passcode is saved)</span><input type="password" id="antKey" autocomplete="off"></label>
       <label class="field"><span class="small">Model</span><input type="text" id="model" autocomplete="off"></label>
     </fieldset>
     <fieldset>
@@ -711,20 +718,23 @@ const KEYTERMS=['bond','Sunbiz','dealer license','effective date','garage liabil
 <script>
 {
 const $=s=>document.querySelector(s);
-const APP_VERSION='10';
+const APP_VERSION='11';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL={me:'You',prospect:'Prospect',call:'Call'};
 const TAG={objection:'Objection',signal:'Buying signal',caution:'Careful',nudge:'Coaching'};
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-const DEF={engine:'chrome',listen:'both',dgKey:'',antKey:'',model:'claude-haiku-5-5',aiOn:false,remember:false,rcAnnounce:true,myName:'',qBiz:'',qCov:''};
+const MANUS_URL='';
+const DEF={engine:'chrome',listen:'both',dgKey:'',antKey:'',mUrl:MANUS_URL,mPass:'',model:'claude-haiku-5-5',aiOn:false,remember:false,rcAnnounce:true,myName:'',qBiz:'',qCov:''};
 let cfg={...DEF};
 try{const saved=JSON.parse(localStorage.getItem('callcoach.cfg')||'null');if(saved)cfg={...DEF,...saved};}catch(e){}
-function saveCfg(){try{const c={...cfg};if(!c.remember){c.dgKey='';c.antKey='';}localStorage.setItem('callcoach.cfg',JSON.stringify(c));}catch(e){}}
+function saveCfg(){try{const c={...cfg};if(!c.remember){c.dgKey='';c.antKey='';c.mPass='';}localStorage.setItem('callcoach.cfg',JSON.stringify(c));}catch(e){}}
 
 const norm=t=>' '+t.toLowerCase().replace(/[‘’]/g,"'").replace(/[^a-z0-9'$%&\s-]/g,' ').replace(/\s+/g,' ')+' ';
 const fmt=ms=>{const s=Math.max(0,Math.floor(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
 const clip=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
-const aiReady=()=>cfg.aiOn&&cfg.antKey;
+const useManus=()=>!!(cfg.mUrl&&cfg.mPass);
+const hasAI=()=>useManus()||!!cfg.antKey;
+const aiReady=()=>cfg.aiOn&&hasAI();
 
 /* ---------- learned playbook (from uploaded RingCentral transcripts) ---------- */
 const LKEY='callcoach.learned';
@@ -859,7 +869,7 @@ function renderLearn(){
       '<label class="field"><span class="small">How did the call end?</span><select data-k="outcome">'+[['unknown','Not sure'],['won','Sold / bound'],['followup','Follow-up set'],['lost','Not sold']].map(([v,l])=>'<option value="'+v+'"'+(c.outcome===v?' selected':'')+'>'+l+'</option>').join('')+'</select></label></div>'+
       '<p class="small" style="margin:0">'+c.utts.length+' turns · '+r.obj.length+' objections · '+r.sig.length+' buying signals · you talked '+pct+'% · '+r.q+' questions · discovery '+r.checks.size+'/'+CHECK.length+'</p>'+
       '<h4>Objections found</h4>'+obj+(r.sig.length?'<h4>Buying signals</h4><ul>'+r.sig.map(o=>'<li><b>'+esc(o.card.title.replace('Buying signal: ',''))+'</b>: "'+esc(clip(o.quote,160))+'"</li>').join('')+'</ul>':'')+cau+nud+miss+ai+
-      '<div class="lactions"><button class="primary" data-act="save">Save replies to playbook</button>'+(aiReady()?'<button data-act="ai">Analyze with Claude</button>':'')+'<button data-act="drop">Remove</button></div></article>';
+      '<div class="lactions"><button class="primary" data-act="save">Save replies to playbook</button>'+(hasAI()?'<button data-act="ai">Analyze with Claude</button>':'')+'<button data-act="drop">Remove</button></div></article>';
   }).join('');
   renderLib();
 }
@@ -1201,6 +1211,17 @@ function stopDemo(){clearTimeout(S.demoT);S.demo=false;S.t1=Date.now();tx.queryS
 const COACH_SYS='You are a live sales coach for a commercial property and casualty insurance agent, giving whispered pointers during a phone call. The transcript is machine-generated and may contain errors. Reply with JSON only: {"headline":"max 8 words","say":"one natural sentence the agent could say next, max 30 words","ask":"one open question, max 20 words","caution":"a compliance or E&O watch-out, or empty string"}. Base it on what the prospect actually said. Never suggest promising coverage, claim payment, or price before underwriting, and never suggest misstating anything on an application.';
 const NOTES_SYS='You write CRM call notes for a commercial P&C insurance agent from a machine transcript and call stats. Plain text, these sections: Summary (2-3 sentences); Prospect details captured (bullets); Objections and how they were handled; Missing information to collect; Next steps (with dates only if stated); Follow-up email the agent can send (short, friendly). Do not invent facts; write "not captured" for unknowns. The email must not promise coverage or pricing.';
 async function claude(system,user,max,temperature){
+  if(useManus()){
+    let r;
+    try{r=await fetch(cfg.mUrl.replace(/\/+$/,'')+'/api/complete',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({passcode:cfg.mPass,system,user,max_tokens:max,temperature:temperature==null?0.4:temperature,model:/sonnet/i.test(cfg.model)?'sonnet':'haiku'})});}
+    catch(e){throw new Error('Could not reach the Manus AI service. Check the service address in Settings.');}
+    const j=await r.json().catch(()=>({}));
+    if(r.status===401)throw new Error('The Manus service rejected the passcode. Check it in Settings.');
+    if(r.status===429)throw new Error('The Manus service hit its hourly limit. Try again in a few minutes.');
+    if(!r.ok)throw new Error('Manus service: '+(j.error||('HTTP '+r.status)));
+    return String(j.text||'').trim();
+  }
   const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
     headers:{'content-type':'application/json','x-api-key':cfg.antKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify(Object.assign({model:cfg.model||DEF.model,max_tokens:max,system,messages:[{role:'user',content:user}]},temperature!=null?{temperature}:{}))});
@@ -1243,7 +1264,7 @@ function summaryText(){
 $('#endBtn').onclick=()=>{
   if(S.running)stopListening();if(S.demo)stopDemo();
   $('#sumText').value=summaryText();$('#aiNotes').hidden=true;
-  $('#aiNotesBtn').hidden=!aiReady();$('#copyBtn').textContent='Copy';
+  $('#aiNotesBtn').hidden=!hasAI();$('#copyBtn').textContent='Copy';
   $('#sumDlg').showModal();
 };
 $('#aiNotesBtn').onclick=async()=>{
@@ -1261,14 +1282,14 @@ $('#sumClose').onclick=()=>{$('#sumDlg').close();$('#consent').checked=false;};
 const setDlg=$('#settings');
 $('#settingsBtn').onclick=()=>{
   setDlg.querySelectorAll('input[name=engine]').forEach(r=>r.checked=r.value===cfg.engine);
-  $('#listen').value=cfg.listen;$('#dgKey').value=cfg.dgKey;$('#antKey').value=cfg.antKey;
+  $('#listen').value=cfg.listen;$('#dgKey').value=cfg.dgKey;$('#antKey').value=cfg.antKey;$('#mUrl').value=cfg.mUrl||'';$('#mPass').value=cfg.mPass||'';
   $('#model').value=cfg.model;$('#aiOn').checked=cfg.aiOn;$('#remember').checked=cfg.remember;$('#rcAnnounce').checked=cfg.rcAnnounce;
   setDlg.showModal();
 };
 setDlg.addEventListener('close',()=>{
   if(setDlg.returnValue!=='save')return;
   cfg={engine:setDlg.querySelector('input[name=engine]:checked')?.value||'chrome',listen:$('#listen').value,
-    dgKey:$('#dgKey').value.trim(),antKey:$('#antKey').value.trim(),model:$('#model').value.trim()||DEF.model,
+    dgKey:$('#dgKey').value.trim(),antKey:$('#antKey').value.trim(),mUrl:$('#mUrl').value.trim()||MANUS_URL,mPass:$('#mPass').value.trim(),model:$('#model').value.trim()||DEF.model,
     aiOn:$('#aiOn').checked,remember:$('#remember').checked,rcAnnounce:$('#rcAnnounce').checked,myName:cfg.myName||'',qBiz:cfg.qBiz||'',qCov:cfg.qCov||''};
   saveCfg();applyDisclosure();if(!S.running&&S.cueKind==='idle')idleCue();else $('#aiBox').hidden=!aiReady();
 });
@@ -1326,8 +1347,9 @@ function qContext(){return {biz:$('#qBiz').value.trim(),cov:$('#qCov').value,det
 async function runQuick(text,more){
   text=(text||'').trim();if(!text)return;
   const card=bestCard(text),ctx=qContext();
-  if(!cfg.antKey){
-    $('#qKey').hidden=false;$('#qKeyIn').focus();
+  if(!hasAI()){
+    $('#qUrlIn').value=cfg.mUrl||'';$('#qUrlRow').hidden=!!MANUS_URL;
+    $('#qKey').hidden=false;$('#qPassIn').focus();
     const local=localPointers(card);
     if(local.length)showResult({pointers:local,card:card.title,caution:card.avoid,src:'From your playbook while AI is off.'});
     else $('#qOut').hidden=true;
@@ -1349,13 +1371,13 @@ async function runQuick(text,more){
     const out=await claude(QUICK_SYS,parts.join('\n\n'),700,more?0.8:0.4);if(seq!==qSeq)return;
     const o=JSON.parse((out.match(/\{[\s\S]*\}/)||['{}'])[0]),ps=(o.pointers||[]).filter(p=>p&&p.say).slice(0,3);
     if(!ps.length)throw new Error('Claude didn\'t return pointers. Try again.');
-    qCur={text,read:o.read||'',pointers:ps,caution:o.caution||'',card:card?card.title:'',ctx,t:Date.now(),ai:true,src:'Written by Claude for this objection'};
+    qCur={text,read:o.read||'',pointers:ps,caution:o.caution||'',card:card?card.title:'',ctx,t:Date.now(),ai:true,src:useManus()?'Written by Claude through your Manus AI service':'Written by Claude for this objection'};
     showResult(qCur);QH.unshift(qCur);saveQH();renderRecent();logQuick(text,ps[0],o.caution);
   }catch(err){
     if(seq!==qSeq)return;
-    const bad=/api.?key|auth|401|invalid x-api-key/i.test(err.message);
+    const bad=/api.?key|auth|401|invalid x-api-key|passcode/i.test(err.message);
     const local=localPointers(card);
-    showResult({pointers:local,card:card?card.title:'',caution:card&&card.avoid,src:(bad?'Your API key was rejected. Check it in Settings.':'Claude error: '+err.message)+(local.length?' Showing your playbook instead.':'')});
+    showResult({pointers:local,card:card?card.title:'',caution:card&&card.avoid,src:(bad?err.message:'AI error: '+err.message)+(local.length?' Showing your playbook instead.':'')});
     if(!local.length)$('#qGrid').innerHTML='<p class="mute" style="margin:0">No pointers yet. Try again in a moment.</p>';
     if(bad)$('#qKey').hidden=false;
   }
@@ -1369,8 +1391,11 @@ $('#qForm').addEventListener('submit',e=>{e.preventDefault();runQuick($('#qText'
 $('#qText').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();runQuick($('#qText').value);}});
 $('#qMore').onclick=()=>{if(qCur)runQuick(qCur.text,true);};
 $('#qKeySave').onclick=()=>{
-  const k=$('#qKeyIn').value.trim();if(!k){$('#qKeyIn').focus();return;}
-  cfg.antKey=k;cfg.remember=$('#qKeyRemember').checked;saveCfg();$('#qKeyIn').value='';$('#qKey').hidden=true;
+  const pass=$('#qPassIn').value.trim(),url=$('#qUrlIn').value.trim()||cfg.mUrl||MANUS_URL,k=$('#qKeyIn').value.trim();
+  if(pass&&!url){$('#qUrlIn').focus();return;}
+  if(!pass&&!k){$('#qPassIn').focus();return;}
+  if(pass){cfg.mPass=pass;cfg.mUrl=url;}if(k)cfg.antKey=k;
+  cfg.remember=$('#qKeyRemember').checked;saveCfg();$('#qPassIn').value='';$('#qKeyIn').value='';$('#qKey').hidden=true;
   if($('#qText').value.trim())runQuick($('#qText').value);
 };
 $('#qRecent').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const h=QH[+b.dataset.i];if(!h)return;

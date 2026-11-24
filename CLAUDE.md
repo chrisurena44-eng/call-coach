@@ -10,7 +10,7 @@ The whole app is `index.html` (one self-contained page). GitHub Pages serves `ma
    - `node tests/regex_test.js index.html` — objection/caution detection against sample lines (all must pass).
    - `python3 tests/ui_test.py` — demo call, practice, summary, settings in headless Chrome (only Google Fonts network errors are acceptable).
    - `python3 tests/learn_test.py` — transcript upload (TXT/DOCX/SRT/RingCentral), teaching, saved replies, export, reload persistence.
-   - `python3 tests/quick_test.py` — Quick objection section: tabs, inline key setup, Claude request contents, 3 more ideas, recent list (API mocked).
+   - `python3 tests/quick_test.py` — Quick objection section: tabs, Manus passcode setup and request contents, wrong passcode, Anthropic fallback, 3 more ideas, recent list (all AI mocked).
 5. Commit and push to `main`.
 
 ## Where things live in index.html
@@ -19,5 +19,7 @@ The whole app is `index.html` (one self-contained page). GitHub Pages serves `ma
 
 ## Context
 - Built for a commercial P&C agent calling from the RingCentral web app (app.ringcentral.com) in Chrome. RingCentral's AI announcement is the default call disclosure.
-- Never put API keys, transcripts or client data in this repository.
+- AI calls go through `claude()`: the user's Manus AI service (`POST {mUrl}/api/complete` with `{passcode, system, user, max_tokens, temperature, model}` → `{text}`) when a passcode is saved, else the Anthropic API key. Prompts live in this repo, so prompt changes never need Manus.
+- Never put API keys, passcodes, transcripts or client data in this repository.
+- Be conservative with the user's Manus credits: only send Manus tasks when needed, on the cheapest setting that works.
 - Talk tracks must not promise coverage, claim payment or price, or encourage misstating application facts.
