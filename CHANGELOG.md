@@ -1,5 +1,8 @@
 # Changelog
 
+## v10 — Nov 23, 2026
+- API key help now points to the Claude Console at platform.claude.com/settings/keys.
+
 ## v9 — Nov 23, 2026
 - **Quick objection is its own section.** Switch between **Live call** and **Quick objection** with the tabs under the header, or press / anywhere.
 - Claude writes three pointers specific to the exact objection and its details: acknowledge and reframe, the question that uncovers what's behind it, and a concrete next step. A one-line read on what's likely going on comes first.

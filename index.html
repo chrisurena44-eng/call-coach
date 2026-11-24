@@ -275,7 +275,7 @@ details ol{margin:8px 0 0;padding-left:20px}
       </div>
     </details>
     <div class="qkey" id="qKey" hidden>
-      <p><b>Turn on AI pointers.</b> Quick objection uses Claude to write pointers for the exact objection. Paste your Anthropic API key (from console.anthropic.com, under API keys). Usage is billed by Anthropic, separately from your Claude plan.</p>
+      <p><b>Turn on AI pointers.</b> Quick objection uses Claude to write pointers for the exact objection. Paste your Claude API key. Make one at platform.claude.com/settings/keys (Claude Console, API keys page). API usage is billed through the Console, separately from your Claude plan; Max, Ultra and Team plans include monthly API credits.</p>
       <div class="row"><input type="password" id="qKeyIn" autocomplete="off" aria-label="Anthropic API key" placeholder="sk-ant-..."><button class="primary" id="qKeySave" type="button">Save and get pointers</button></div>
       <label class="opt small"><input type="checkbox" id="qKeyRemember" checked><span>Remember the key in this browser</span></label>
     </div>
@@ -711,7 +711,7 @@ const KEYTERMS=['bond','Sunbiz','dealer license','effective date','garage liabil
 <script>
 {
 const $=s=>document.querySelector(s);
-const APP_VERSION='9';
+const APP_VERSION='10';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL={me:'You',prospect:'Prospect',call:'Call'};
 const TAG={objection:'Objection',signal:'Buying signal',caution:'Careful',nudge:'Coaching'};
