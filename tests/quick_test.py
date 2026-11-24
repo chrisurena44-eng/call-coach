@@ -7,7 +7,7 @@ URL='file://'+os.path.join(ROOT,'index.html')
 SVC='https://callcoachai-jwnbgrgv.manus.space'  # built-in address; every request to it is mocked here
 def answer(tag):
     return json.dumps({"read":"They see the 3-year term as a reason not to look, not as a price problem.",
-      "pointers":[{"title":f"Respect the term {tag}","say":"A three-year deal makes sense. Let's make sure you're ready before it ends.","ask":"When does the term end?"},
+      "pointers":[{"title":f"Respect the term {tag}","say":"A three-year deal makes sense. Let's lock in a review date now. Is Monday or Tuesday better?","pushback":"Then let's put it on the calendar right now."},
                   {"title":f"Find the real lock {tag}","say":"Is it the contract itself, or a penalty for leaving early?","ask":"Any cancellation fees?"},
                   {"title":f"Calendar the review {tag}","say":"I'll set a reminder 90 days out and send a side-by-side then.","ask":"Email or a call?"}],
       "caution":"Don't advise cancelling mid-term without checking short-rate penalties."})
@@ -41,8 +41,10 @@ async def main():
         assert body['passcode']=='test-passcode' and body['temperature']==0.4 and body['model']=='haiku' and body['max_tokens']==700
         assert 'exactly as typed: "we\'re locked into a 3-year deal with our carrier"' in body['user']
         assert 'used car dealer' in body['user'] and 'Surety / dealer bond' in body['user'] and 'renews in March' in body['user']
-        assert 'All three pointers must address this objection' in body['system']
+        assert 'All three lines must address this objection' in body['system']
         assert 'we never email, text or send quotes' in body['system'] and 'Every set must end by asking for the sale' in body['system']
+        assert 'Every line must end with a question that asks for a decision or a time' in body['system']
+        assert 'If they push back: Then let' in await pg.text_content('#qGrid')
         titles=await pg.locator('#qGrid h3').all_text_contents(); assert len(titles)==3 and titles[0].endswith('1'), titles
         print('MANUS OK:',titles,'|',await pg.text_content('#qSrc'))
         await pg.click('#qMore'); await pg.wait_for_timeout(500)

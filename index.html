@@ -392,42 +392,42 @@ const PLAYBOOK=[
 {id:'price',title:'Price: "It\'s too expensive"',
  re:/\b((price|premium|rate|quote|cost|it|that|this)('?s| is| was| seems)? (way |just |a little |a bit |kind of )?too (high|much|expensive)(?! (paperwork|hassle|work|time|trouble|of a hassle))|too expensive|(so|really|very|pretty) expensive|it'?s expensive|can'?t afford|cannot afford|out of (my|our) budget|(the )?price doesn'?t work|get the (premium|price) down|more than (we|i) pay now|(premium|price|rate|renewal|bill)s? (went|go|going|have gone|has gone|keeps going|jumped|doubled)( way)? up|costs? (too much|a lot)|outrageous|kills me)\b/,
  why:'The value isn\'t clear yet, or a renewal increase stung. Commercial increases come from rate, exposure (payroll, sales, vehicles) or losses.',
- say:'Totally fair, nobody wants to overpay. Let me take a crack at it right now. If I can beat what you\'re paying, are you ready to move today?',
+ say:'Totally fair. Let me take a crack at it right now. If I beat what you\'re paying, are we getting you started today?',
  ask:'What are you paying right now, and when does it renew?',
  next:'Grab your dec page and read me the premium and renewal date. I\'ll run it while we\'re on the phone.',
  avoid:'Don\'t promise a lower premium, or cut coverage, before explaining the trade-off.'},
 {id:'friendprice',title:'"My buddy pays less"',
  re:/\b(cheaper|less|lower) than (what )?(my|his|her|our) (buddy|friend|brother|cousin|neighbor|partner)\b|\b(my )?(buddy|friend|brother|cousin|neighbor)('?s)? .{0,40}\b(pays? less|cheaper|better (price|rate|deal)|lower (price|rate))\b|\bhow (did|does) (he|she|they) get\b.{0,15}\b(better|lower|cheaper)\b|\b(he|she|they) (pays?|paid|got it for|is paying) less\b/,
  why:'Comparing to someone else\'s price. Differences usually come from a bond or fee bundled in, a different quote date, a rate update, or different limits.',
- say:'Love that you\'re comparing. When two quotes are that close, it\'s usually a bond or a fee bundled in, not the rate. Let me line them up.',
+ say:'Love it, let\'s settle it right now. Read me what\'s on their quote and I\'ll show you the difference. Got it in front of you?',
  ask:'Do you have the quote they gave you handy?',
  next:'Read me what\'s on their quote, and I\'ll show you right now exactly where the difference is.',
  avoid:'Don\'t share another client\'s premium or policy details.'},
 {id:'quote',title:'"I got a cheaper quote"',
  re:/\b(got|have|received|found) (a |another )?(cheaper|lower|better) (quote|price|number|offer)\b|\b(another|other) (carrier|company|agent|agency|broker) (came in|was|is|quoted( us)?) (lower|cheaper|less)\b|\bquote for less\b|\bbeat you by\b|\bcan you match (this|that|their)\b|\bmuch higher than\b/,
  why:'They assume the quotes cover the same thing, or want a reason to keep shopping.',
- say:'Good, you should shop it. Just don\'t pick on price alone. Let me show you right now what you\'d actually be getting with me.',
+ say:'Good, shop it. But let\'s decide on facts, not just a number. Read me what they quoted and we\'ll compare right now. Got it handy?',
  ask:'Who\'s the other quote from, and what\'s the number?',
  next:'Read me their number and what\'s included, and I\'ll show you right now where we stack up.',
  avoid:'Don\'t call their quote inadequate before reading it, and don\'t promise to match it.'},
 {id:'agent',title:'"We already have an agent"',
  re:/\b(happy|satisfied|good|fine|comfortable) with (my|our) (current )?(agent|broker|carrier|insurance|company|guy|agency|policy)|\balready (have|got|work with) (an |a )?(agent|broker|agency)\b|\bbroker of record\b|\b(my|our) (agent|broker|guy|agency) (takes care|handles|has been)|\b(like|love|trust) (my|our) (current )?(agent|broker|agency)\b|\b(don'?t|do not) want to switch\b|\bnot looking to (change|switch)\b|\b(they'?ve|they have) always taken care of us\b|been with (them|him|her|\w+( \w+)?) (for )?(years|forever|a long time|(\w+|\d+) years)|(brother|cousin|friend|uncle|dad|father|buddy|family) (is|does|handles) (my|our) insurance|\bloyal\b/,
  why:'Loyalty and switching friction, not a real no. Aim for a second opinion, not a switch today.',
- say:'That\'s great, I\'m not here to knock your agent. All I\'m asking for is a shot at a second opinion before your renewal.',
+ say:'I\'m not here to knock your agent. Give me one shot at a second opinion. Can you grab your dec page right now?',
  ask:'When\'s the last time your agent actually shopped your policy?',
  next:'Send me your dec page. If your agent has you set up right, I\'ll be the first to tell you.',
  avoid:'Don\'t criticize their agent, and don\'t suggest moving the account without the proper broker-of-record process.'},
 {id:'send',title:'"Just email me the quote"',
  re:/\b(send|email|e-mail|mail) (me|us)\b(?! (the |an? )?(application|app|apps|paperwork|docs|documents|invoice|bill|contract|binder|policy|certificate))|\bput (it|that|something) in (an )?(email|writing)\b|\bjust (send|email) (it|that|something)\b|\bsend (this|it|that) over\b/,
  why:'Usually a way to get off the phone, or to shop your number with another agent. Keep the quote on the phone.',
- say:'I don\'t email quotes. A number without the details doesn\'t tell you anything. Give me five minutes and I\'ll walk you through it right now.',
+ say:'I don\'t email quotes. Let\'s review it together right now and make a decision while we\'re on the phone. Is now good, or is 3 o\'clock better?',
  ask:'Do you have five minutes now, or is 3 o\'clock better?',
  next:'Let\'s go over it right now. If it makes sense, we lock it in today before the quote expires.',
  avoid:'Don\'t email or text the quote; present it live. Don\'t call a rough number a bound quote.'},
 {id:'notint',title:'"Not interested / we\'re covered"',
  re:/\b(not interested|no thanks|no thank you|(we'?re|we are|i'?m|i am) (all set|covered|taken care of|good on (insurance|that|coverage))|we (already )?have (insurance|coverage)|already (have|got) (insurance|coverage)|don'?t need (it|any|anything|insurance))\b/,
  why:'A reflex answer, especially on cold calls. Look for one real pain point, and respect a firm no.',
- say:'Fair enough, I get calls like this too. Can I ask you one quick question, and if it\'s not a fit I\'ll let you go?',
+ say:'Fair enough. One quick question and I\'ll let you go: when does your policy renew?',
  ask:'When does your policy renew?',
  next:'No problem. Mind if I reach out a couple of months before renewal, just to give you a number to compare?',
  avoid:'If they say no again, thank them and end the call.'},
@@ -441,154 +441,154 @@ const PLAYBOOK=[
 {id:'busy',title:'"Bad time / I\'m on a job"',
  re:/\b(too busy|swamped|slammed)( right now)?\b|\bnot (a good|the right|a great) time\b|\b(bad|busy) time\b|\b(i'?m|i am) (on a job|driving|in the middle of)\b|\bonly (have|got) a (minute|second)\b|\bcan'?t (do|talk) (this|right) now\b|\bcall me (another|some other) time\b/,
  why:'They may simply be busy. Ask for a better time instead of pushing through.',
- say:'No worries. I can be quick, or I can call you back. Your choice.',
+ say:'No problem, I\'ll be quick. Is later today or first thing tomorrow better for ten minutes?',
  ask:'Is later today or tomorrow morning better?',
  next:'I\'ll put you down for tomorrow at 9. Ten minutes, tops. Sound good?',
  avoid:'Respect a request to end the call. "Not now" isn\'t permission for repeated calls.'},
 {id:'timing',title:'"Call me closer to renewal"',
  re:/\b(call|reach out to|contact|get back to|check (back )?with) (me|us) (back )?(later|next (week|month|year)|in (a few|a couple|\w+) (weeks|months)|closer|around|after|in the (spring|summer|fall|new year))|\b(renewal|policy|it) (isn'?t|is not|doesn'?t|does not) (up |renew |expire )?(until|for)\b|\bnot up (until|for)\b|\bnot up for renewal\b|\bcloser to (the )?(renewal|expiration|that time)\b|\btoo early to shop\b|\bwe (renew|have) (in )?(\w+|\d+) months\b/,
  why:'Their renewal date is your timeline. Carriers want commercial submissions well ahead of renewal, and waiting costs options.',
- say:'Makes sense. If we start now, you\'ll have real options before renewal instead of a rushed decision the last week.',
+ say:'Perfect, that gives us time to do it right instead of rushing. Let\'s lock in your info today. Do you have your dec page handy?',
  ask:'What\'s the exact renewal date?',
  next:'Let\'s lock in your info today so you\'re first in line at renewal. Can you send me your loss runs this week?',
  avoid:'Don\'t suggest cancelling the current policy until dates and transition steps are confirmed.'},
 {id:'think',title:'"I need to think about it"',
  re:/\b(need|want|have|got) to think (about )?it( over)?\b|\blet me (think about it|sleep on it|look into it|mull it over)\b|\bneed (more|some) time\b|\bnot ready to (decide|commit|make a decision)\b|\bi'?ll (get back to you|let you know)\b/,
  why:'Usually one question is still unanswered, or they\'re uncomfortable deciding on the call.',
- say:'Totally get it. Usually when someone says that, there\'s one thing still bugging them. What is it?',
+ say:'Totally fair. What\'s the one thing you\'d need to feel good saying yes right now?',
  ask:'Is it the price, the coverage, or something else?',
  next:'Let\'s knock it out now while it\'s fresh. What\'s the one thing you\'d need to feel good saying yes today?',
  avoid:'Don\'t invent urgency about a quote expiring or a start date.'},
 {id:'decider',title:'"I need to talk to my partner"',
  re:/\b(talk|speak|check|discuss|run (it|this|that)) (it |this |that )?(over )?(to|with|by) (my|our|the) (business )?(partner|wife|husband|spouse|accountant|cpa|cfo|bookkeeper|boss|owner|office manager|dad|father|mom|mother|brother)s?\b|\bnot (really )?(my|up to me) (decision|call)\b|\bnot up to me\b|\b(partner|owner|wife|husband|boss|accountant|cfo) (makes|handles|decides)\b|\bneed (approval|sign off)\b|\bcan'?t decide (this )?alone\b/,
  why:'Someone else controls the budget or the decision. Bring them in rather than pushing.',
- say:'Totally get it. I\'d rather they hear it straight from me than secondhand. Let\'s get them on a quick call.',
+ say:'Makes sense. Let\'s get them on the phone so you can decide together. Can you conference them in now, or is tonight better?',
  ask:'What\'s going to matter most to them, price or coverage?',
  next:'Let\'s get them on the line right now, or set 15 minutes today. Which works?',
  avoid:'Confirm who is authorized to give information, approve terms and request binding.'},
 {id:'small',title:'"We\'re too small to need it"',
  re:/\b(we'?re|we are|i'?m|i am) (too small|just a small|only a small|a small (shop|business|company|outfit))\b|\b(it'?s|that'?s) not required\b|\b(don'?t|do not) (really )?need (that|this) (coverage|insurance|policy)\b|\bpay (for it |for that )?out of pocket\b|\bnot much (exposure|risk)\b|\bwe'?re just (a few|two|three) (people|guys)\b/,
  why:'They see insurance as a big-company cost, or think small firms don\'t have big losses.',
- say:'I hear that a lot from smaller shops. The thing is, one bad claim hits a small business a lot harder than a big one.',
+ say:'That\'s exactly why it matters. One bad claim hurts a small shop the most. Let\'s price just the essentials right now, okay?',
  ask:'If someone got hurt on a job tomorrow, how would you handle that?',
  next:'Let me quote just the essentials first, so you can see what it really costs. Fair?',
  avoid:'Don\'t say a coverage is legally required, or unnecessary, without checking the law, contract and facts.'},
 {id:'noclaims',title:'"We\'ve never had a claim"',
  re:/\b(never|haven'?t|have not|hasn'?t) (ever )?(had|filed|made|used|needed) (a|any|one|it|insurance|our insurance)\b|\b(no|zero|don'?t have any) (claims|losses)\b|\bclaim[- ]free\b|\bnothing'?s (ever )?happened\b|\bwe'?ve been lucky\b|\bloss history is clean\b|\bpaying for nothing\b|\bwaste of money\b|\bnever (use|need) it\b/,
  why:'A clean history is leverage with underwriters, not proof future coverage won\'t matter.',
- say:'That\'s awesome, and honestly that\'s leverage. Carriers like a clean record, so let\'s put it to work when I shop you.',
+ say:'That\'s leverage, and I want to use it for you. Can you get me your loss runs today so I can go to work?',
  ask:'Can you get me your five-year loss runs so I can show that off?',
  next:'Send me the loss runs today and I\'ll put your clean record to work. When can you get them to me?',
  avoid:'Don\'t imply a clean history guarantees acceptance or a lower price.'},
 {id:'minimum',title:'"I just need the minimum"',
  re:/\b(just|only) (need|want|looking for) (the |a )?(minimum|bare minimum|basics?|cheapest|cheapest (policy|thing|one))\b|\bstate minimum\b|\b(bare minimum|minimum coverage|cheapest (policy|option|thing|one))\b/,
  why:'Price-first buyer. Fine, as long as lean still covers what could sink the business.',
- say:'No problem, we can keep it lean. I just want to make sure lean doesn\'t mean one claim puts you out of business.',
+ say:'We can keep it lean. Let\'s look at the minimum and one stronger option right now, and you pick. Sound good?',
  ask:'What would hurt the most if it happened tomorrow?',
  next:'Let me show you the minimum and one stronger option right now, and you pick. Which way are you leaning?',
  avoid:'If they decline coverage you recommended, document it in writing.'},
 {id:'cert',title:'Certificate or contract wording',
  re:/\b(just|only) (need|want) (a |the )?(certificate|cert|coi|proof of insurance)\b|\bcertificate is enough\b|\b(coi|certificate|cert) says (we'?re|we are) covered\b|\bonly want a coi\b|\badd (them|him|her|the gc|my gc|the landlord) (as )?(an )?additional insured\b|\bblanket additional insured\b|\bwaiver of subrogation\b|\bprimary (and )?non[- ]?contributory\b|\b30 days'? notice\b|\b(gc|general contractor|contractor|landlord|lease|contract|client|property manager) (just |only )?(needs|requires|wants|is asking for|asked for) (a |an |the )?(certificate|cert|coi|proof|additional insured|insurance)/,
  why:'A certificate only summarizes the policy; it can\'t add coverage. The contract may require additional insured, waiver or primary wording that must be on the policy itself.',
- say:'Easy, I handle these all the time. Send me what the GC is asking for and I\'ll make sure your certificate doesn\'t hold up the job.',
+ say:'Easy, I handle these all the time. Send me what the GC is asking for and I\'ll match it today. When do you need it by?',
  ask:'When do you need the certificate by?',
  next:'Send me the contract\'s insurance page now and I\'ll get you a quote that matches it today.',
  avoid:'Never issue or promise certificate wording, additional-insured status or notice rights the policy doesn\'t give.'},
 {id:'paperwork',title:'"Too much paperwork / no time"',
  re:/\btoo much (paperwork|hassle|work|time)\b|\b(don'?t|do not) (have|got) (the )?time\b|\b(don'?t|do not) want to (fill out|deal with|do) (all )?(the |that |those )?(paperwork|forms|applications|apps)|\b(long|lot of|so many) (forms|applications|questions|paperwork)\b|\b(what a|such a|it'?s a) hassle\b|\btakes too long\b/,
  why:'Friction, not disinterest. Make it easy and do the heavy lifting.',
- say:'Nobody likes paperwork. Good news: I do the heavy lifting. You send me two things and sign.',
+ say:'I\'ll do the heavy lifting. Snap a picture of your dec page and text it to me right now, and I\'ll handle the rest. Deal?',
  ask:'Can you snap a picture of your current dec page for me?',
  next:'Text it to me today and I\'ll have a pre-filled application back to you tomorrow.',
  avoid:'Don\'t guess at application answers to save time. Have them review every answer.'},
 {id:'misdescribe',title:'"Can the application just say…"',
  re:/\b(the )?(app|application) can (just )?say\b|\bcan (the |we |you )?(app|application)( just)? say\b|\b(just )?(put|list) (us|it|me|them) (down )?as\b|\bcan we (just )?(leave|keep) (that|it|them) off\b|\b(don'?t|do not) (put|mention) (that|the roofing|the claims?|the subs)\b|\bwe never do roofing\b|\bnobody works above\b/,
  why:'They think a simpler description will be easier or cheaper to place. Actual operations drive eligibility and coverage.',
- say:'I get why you\'d want that, but let\'s do it right so a claim never gets kicked back. I\'ll find a carrier that fits what you actually do.',
+ say:'Let\'s do it right so a claim never gets kicked back. I\'ll find the carrier that fits your real work. What do you do day to day?',
  ask:'Walk me through a typical job real quick?',
  next:'Give me the real details and I\'ll take you to the carriers that like your kind of work.',
  avoid:'Never help a prospect leave out or misstate operations, payroll, subs or losses.'},
 {id:'subs',title:'"My subs are 1099 / no employees"',
  re:/\b(no|don'?t have any|do not have any|zero) employees\b|\bjust (me|myself|me and my (wife|husband|son|daughter|partner))\b|\b(1099|ten ninety nine|subcontractors?|subs|contract labor)\b.{0,40}\btheir own (insurance|coverage|comp|workers comp)|\b(they|subs|guys) (have|carry|got) their own (insurance|coverage|comp)\b|\b(they'?re|they are) (all )?(independent contractors|1099|ten ninety nine)\b|\b(workers'? )?comp (doesn'?t|does not) apply\b|\b(comp|workers comp) exemption\b|\bexempt from (workers comp|comp)\b|\b(only|all) (1099|ten ninety nine|subs|subcontractors)\b|\bwe (just|only) use (subs|subcontractors)\b/,
  why:'The 1099 label alone doesn\'t settle comp. Uninsured subs often turn into payroll at audit.',
- say:'Got it. Quick heads-up that saves contractors real money: if a sub doesn\'t have their own certificate, the audit can count them as your payroll.',
+ say:'Heads up: if a sub doesn\'t have their own certificate, the audit can count them as your payroll. Are you collecting certificates from every sub?',
  ask:'Are you collecting certificates from all your subs right now?',
  next:'I\'ll send you a simple sheet to track sub certificates so the audit doesn\'t bite you.',
  avoid:'Don\'t give a blanket answer from "1099"; state rules and audit treatment vary.'},
 {id:'audit',title:'Audit worries',
  re:/\baudit\b.{0,30}\b(bill|charge|surprise|killed|hit|owed|owe|came back|additional|extra)\b|\b(owed|owe|pay|paid) .{0,25}(after|at|from) (the |our |an )?audit\b|\b(don'?t|do not) want an audit\b|\b(they'?ll|they will) charge (us|me) more later\b|\bclass code (is|was) wrong\b|\bpayroll changes\b/,
  why:'Audit bills come from low payroll or sales estimates, wrong class codes, or uninsured subs.',
- say:'Audit bills hurt. The good news is most of that is fixable up front if we set your numbers right.',
+ say:'Audit bills hurt, and most of that is fixable up front. Let\'s set your numbers right today. What payroll did they have you down for?',
  ask:'What payroll and sales did they have you down for?',
  next:'Let\'s go over your real numbers this week so next year\'s audit doesn\'t surprise you.',
  avoid:'Don\'t guarantee the final premium or lowball exposures to make a quote look cheaper.'},
 {id:'hnoa',title:'"They drive their own cars"',
  re:/\b(employees?|guys|they|we) (use|drive) (their|our) (own|personal) (cars?|trucks?|vehicles?)\b|\bpersonal (vehicles?|cars?|trucks?)\b|\b(rent|rented|borrow) (a |the )?(vans?|trucks?|cars?|vehicles?)\b|\bonly (have )?one truck\b|\bnobody drives (much|for (work|business))\b|\bpersonal (auto|policy) covers\b/,
  why:'They think only company vehicles create an auto exposure. Hired and non-owned auto is a separate business risk.',
- say:'Totally normal. The catch is if one of your guys wrecks on a work errand in his own car, they come after the business.',
+ say:'If one of your guys wrecks on a work errand in his own car, they come after the business. Let\'s price that right now, okay?',
  ask:'How often do your guys drive their own cars for work?',
  next:'I\'ll add that to your quote so you can see exactly what it costs.',
  avoid:'Don\'t promise their personal auto or a business policy covers every use without checking the forms.'},
 {id:'property',title:'"My landlord covers it"',
  re:/\b(only|just) need (general )?liability\b|\b(my|our|the) landlord('?s)? (covers|insures|has (insurance|it covered))\b|\bhomeowners?( policy| insurance)? covers (the|my|our) business\b|\b(don'?t|do not) have (any )?inventory\b|\b(i|we) rent,? so (i|we) (don'?t|do not) need\b/,
  why:'They assume a landlord\'s or personal policy protects their equipment, contents and improvements.',
- say:'Makes sense, but the landlord\'s policy is built for the landlord, not your stuff. If there\'s a fire, your equipment is on you.',
+ say:'The landlord\'s policy covers the landlord, not your stuff. Let\'s price your equipment right now. What would it cost to replace it?',
  ask:'Roughly what would it cost to replace your equipment and setup?',
  next:'Send me your lease, and I\'ll quote your stuff and walk you through the price on the phone.',
  avoid:'Don\'t say every BOP includes the same coverages; check the form.'},
 {id:'garage',title:'"Garage liability covers customer cars"',
  re:/\bgarage (policy|liability|insurance) covers (the )?(customer|customers'?|their) (cars?|vehicles?)\b|\b(don'?t|do not) need garage ?keepers\b|\bcustomers? (are|is) responsible\b|\bkeep (customer |customers'? |the )?(cars?|vehicles?) overnight\b|\bgarage liability covers (all )?that\b/,
  why:'Garage liability and garagekeepers cover different exposures. Customer vehicles in their care are a garagekeepers question.',
- say:'A lot of shops think that. Garage liability and garagekeepers are two different things, and customer cars are the second one.',
+ say:'Garage liability and garagekeepers are two different things, and customer cars fall on garagekeepers. Let\'s add it and see the number right now, okay?',
  ask:'How many customer cars are on your lot on a typical night?',
  next:'Let me add garagekeepers to the quote so you can see what it costs.',
  avoid:'Don\'t promise customer-car coverage without reviewing the garage policy and endorsements.'},
 {id:'surplus',title:'"Is a surplus lines carrier safe?"',
  re:/\b(surplus lines?|non[- ]?admitted|excess and surplus|e ?& ?s|e and s)\b|\bunlicensed (insurer|carrier|company)\b|\b(want|prefer) an admitted\b|\bguaranty fund\b|\b(never heard of|who is|who'?s) (that|this|the) (company|carrier|insurer|insurance company)\b|\bis (that|this|the) (company|carrier|insurer) (legit|any good|safe|rated|stable|real)\b/,
  why:'A fair concern. Surplus lines carriers aren\'t backed by the state guaranty fund (FIGA in Florida), and their forms vary more.',
- say:'Fair question. These carriers write the risks the standard companies won\'t, and I only use ones with strong ratings.',
+ say:'Fair question. I only use carriers with strong ratings. If I show you the rating right now, are you comfortable moving forward?',
  ask:'Would it help if I sent you the carrier\'s rating before you decide?',
  next:'I\'ll email you the rating and the key points today so you can feel good about it.',
  avoid:'Give the required surplus lines disclosures. Never call it "the same as" an admitted policy.'},
 {id:'deductible',title:'Deductible pushback',
  re:/\bdeductible\b.{0,25}\b(too (high|much|big)|lower|higher|raise|smaller|can'?t afford)\b|\b(lower|smaller|raise|higher|reduce) (the |my |our |that )?deductible/,
  why:'A trade-off between premium and out-of-pocket cost. Show both sides.',
- say:'We can play with that. A higher deductible drops your premium, a lower one costs more. Let\'s find your sweet spot.',
+ say:'Easy fix. Let\'s run a higher and a lower deductible right now, and you pick. What could you pay out of pocket on a claim?',
  ask:'What could you comfortably pay out of pocket on a claim?',
  next:'Let me run both numbers while we\'re on the phone, and you pick.',
  avoid:''},
 {id:'umbrella',title:'"Why do I need an umbrella?"',
  re:/\b(why|do (i|we)|would (i|we)|not sure (i|we)|don'?t think (i|we)) (even |really )?(need|want) (an |the )?(umbrella|excess)\b|\bumbrella\b.{0,25}\b(overkill|unnecessary|too much|waste|don'?t need)\b|\b(a |one )?million (is|should be) (enough|plenty)\b|\b(limits|coverage) (is|are) (enough|plenty)\b/,
  why:'Underestimates how big a serious auto or injury claim can get.',
- say:'Most people don\'t think they need one until a lawsuit comes in over their limit. Let me at least show you the price.',
+ say:'Most people don\'t think they need one until a lawsuit comes in over their limit. Let\'s price it right now and you decide. Fair?',
  ask:'Do any of your contracts ask for more than a million?',
  next:'I\'ll price an umbrella right now so you can see the number and decide on the spot.',
  avoid:'Don\'t quote umbrella pricing until underlying limits and vehicles are confirmed.'},
 {id:'online',title:'"I can get it cheaper online"',
  re:/\b(online|website|on the internet|an app)\b.{0,30}\b(cheaper|less|quote|lower)\b|\b(got|get|found|saw) (a )?quotes? online\b|\b(next insurance|hiscox|thimble|simply business|coverwallet)\b|\bdirect(ly)? (with|from|through) (the )?(carrier|company|insurer)\b/,
  why:'Online can fit very simple risks, but class codes, exclusions and endorsements often don\'t match the real operations.',
- say:'Online works for some businesses. My job is making sure what you buy actually fits what you do.',
+ say:'Online works for some. Let\'s make sure it fits what you actually do. Read me what they\'re offering and we\'ll compare right now, okay?',
  ask:'Can you send me that online quote so I can check it against what you do?',
  next:'Read me what they\'re offering and I\'ll compare it right now while I have you.',
  avoid:'Read their quote before saying it won\'t respond. Compare form to form.'},
 {id:'payment',title:'"Can\'t pay it all up front"',
  re:/\b(can'?t|cannot|can not) (pay|afford|swing|do) (it |that |the whole thing )?(all )?(at once|up ?front|in full|in one shot)|\b(down payment|deposit)\b.{0,20}\b(too (high|much|big)|steep|a lot)\b|\bmonthly (payments?|plan|installments?)\b|\bpayment plans?\b|\bpay(ing)? (it )?monthly\b|\binstallments?\b|\bfinanc(e|ing) it\b/,
  why:'A cash-flow question, not a coverage one. Usually solvable.',
- say:'Totally get it, cash flow matters. There are ways to spread it out so it doesn\'t hit all at once.',
+ say:'Cash flow matters. Let\'s spread it out. What monthly number works, so we can get you started today?',
  ask:'What monthly number would work for you?',
  next:'Let me get you the down payment and monthly right now. If it works, we get you started today.',
  avoid:'Don\'t guess a monthly amount. Disclose finance charges and what happens if a payment is missed.'},
 {id:'trust',title:'"Insurance never pays"',
  re:/\b(insurance( companies)?|they|carriers?) (never|don'?t|do not|won'?t) (pay|cover anything)\b|\b(denied|rejected) (my|our|a|the) claim\b|\bclaim (got |was )?(denied|rejected)\b|\bbad (experience|claims experience)\b|\b(rip ?off|scam|legalized robbery)\b|\b(fought|fight|fighting) (us|me) on\b/,
  why:'A trust problem. Listen first. Often the denial came from a gap nobody explained.',
- say:'I\'m sorry that happened. That\'s exactly why I walk my clients through what is and isn\'t covered before they buy.',
+ say:'I\'m sorry that happened. That\'s exactly why I walk you through it before you buy. Let\'s look at your policy right now, okay?',
  ask:'What happened with that claim?',
  next:'Let me look at your current policy and show you any gaps, no strings attached.',
  avoid:'Don\'t promise that a future claim will be paid.'},
 {id:'same',title:'"It\'s all the same coverage"',
  re:/\b(it'?s|its|they'?re|they are|insurance is) all (the same|alike)\b|\bsame (coverage|policy|thing)\b|\bapples to apples\b|\b(just|only) (care|caring|worried|looking) (about|at) (the )?price\b|\binsurance is insurance\b/,
  why:'Commercial forms differ a lot: exclusions, sublimits, who counts as an additional insured.',
- say:'They look the same on paper, but the fine print isn\'t. I\'ll show you the differences in two minutes.',
+ say:'They look the same on paper, but the fine print isn\'t. Give me two minutes right now and I\'ll show you. Ready?',
  ask:'Want me to put them side by side for you?',
  next:'Let me walk you through the differences right now on the phone. Got five minutes?',
  avoid:'Don\'t call two policies identical unless you\'ve compared forms and endorsements.'}
@@ -598,21 +598,21 @@ const SIGNALS=[
 {id:'shape',title:'Buying signal: they\'re shaping the policy',
  re:/\bwhat (would|does|will) it cost (if|to) (i |we )?add\b|\b(can|could) you (increase|raise|bump up) (the |my |our )?limits?\b|\b(can|could) you add (my|our|the) (gc|general contractor|landlord|lender|client)\b|\bwhat (are|would be) the payment options\b|\b(can|could) my (business )?(partner|wife|husband) (join|get on)\b/,
  why:'Questions about options mean they\'re picturing themselves with the policy.',
- say:'Good call, let me price that out for you right now.',
+ say:'Good call. Let me price that right now. Do you want it in?',
  ask:'Do you want that in the final quote?',
  next:'Let me price both while I have you, and we\'ll lock in the one you like today.',
  avoid:'Don\'t promise an add-on is available until the carrier confirms it.'},
 {id:'startdate',title:'Buying signal: wants to lock in a start date',
  re:/\block (it|this|that|the price|the rate|it all) in\b|\b(longest|how far out|how far ahead|how far) (can|could) (i|we|you)\b.{0,25}\b(date|post ?-?date|set|push|hold)\b|\bdate it out\b|\bpost ?-?dat(e|ed|ing)\b|\bhow long (is|does|will) (the|this|my) (quote|price|rate) (good|valid|last|hold)\b/,
  why:'They\'re planning when coverage starts, which means they\'ve decided. Lock it in before the quote expires.',
- say:'Let\'s lock it in. I can set it to start on the date you need, as long as the carrier allows it.',
+ say:'Let\'s lock it in. What date do you need it to start, today or the 1st?',
  ask:'What date do you need coverage to start?',
  next:'Let\'s bind it right now with your start date set so the price holds. Ready?',
  avoid:'Check the quote\'s expiration and the carrier\'s limit on future start dates before promising a date.'},
 {id:'buy',title:'Buying signal: move to the close',
  re:/\bhow (soon|fast|quickly) (can|could|would) (we|i|you|it|this|coverage)\b|\bwhat (do|would) you need (from (me|us)|to get (started|going))\b|\bwhat'?s the next step\b|\bnext steps?\b|\b(send|email) (me|us) (the |an? )?(application|app|apps|paperwork|docs|documents)\b|\bhow (do|would|can) (i|we) pay\b|\bwhen (would|will|can|could) (coverage|it|the policy) (start|begin|be effective)\b|\beffective date\b|\b(can|could) (we|you) (bind|start|lock) (it|this|that|coverage|in)\b|\bbind (it|this) today\b|\b(can|could) (we|you) make it effective\b|\blet'?s (do it|do this|move forward|go ahead|get (it|this) (started|going|done))\b|\bwhere do i sign\b|\bif (you|we) can (beat|match|get)\b/,
  why:'They\'re asking how, not whether. Stop selling and make the next step easy.',
- say:'Perfect, let\'s get you set up right now.',
+ say:'Perfect, let\'s get you set up right now. Do you want it to start today or on your renewal date?',
  ask:'Do you want it to start on your renewal date or sooner?',
  next:'I\'ll send the application to sign while we\'re on the phone, and we\'ll get the down payment taken care of.',
  avoid:'Don\'t say they\'re covered until the carrier confirms the bind in writing.'}
@@ -721,7 +721,7 @@ const KEYTERMS=['bond','Sunbiz','dealer license','effective date','garage liabil
 <script>
 {
 const $=s=>document.querySelector(s);
-const APP_VERSION='15';
+const APP_VERSION='16';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL={me:'You',prospect:'Prospect',call:'Call'};
 const TAG={objection:'Objection',signal:'Buying signal',caution:'Careful',nudge:'Coaching'};
@@ -1213,7 +1213,7 @@ function runDemo(){
 function stopDemo(){clearTimeout(S.demoT);S.demo=false;S.t1=Date.now();tx.querySelectorAll('.interim').forEach(n=>n.remove());setStatus(false);}
 
 /* ---------- AI coach ---------- */
-const COACH_SYS='You are a top-producing commercial P&C insurance agent whispering to a teammate during a live sales call. The transcript is machine-generated and may contain errors. Give the next line to say: assertive, confident, plain-spoken, max 25 words, aimed at closing (disarm, isolate the objection, or ask for the sale or a hard next step with a specific time). Agency rule: we never email, text or send quotes or written price comparisons; quotes are presented live and closed on the call. Do not explain coverage unless the prospect asked about it; no canned phrases; urgency only from real deadlines. Reply with JSON only: {"headline":"max 6 words","say":"the exact line to say","ask":"one short closing question","caution":"a compliance watch-out only if there is a real risk, else empty string"}. Never promise coverage, claim payment, savings or price, and never suggest misstating anything on an application.';
+const COACH_SYS='You are a top-producing commercial P&C insurance closer whispering to a teammate during a live sales call. The transcript is machine-generated and may contain errors. Give the next line to say: a close. Direct, confident, upbeat, no explaining, max 25 words, ending with a question that asks for a decision or a time, ideally an either/or. Example of the energy: "Let\'s review it together now and make a decision while we\'re on the phone. Is now better, or should we talk at 3 o\'clock?" Agency rule: we never email, text or send quotes or written price comparisons; quotes are presented live and closed on the call. No coverage lectures unless the prospect asked about coverage; no canned phrases; urgency only from real deadlines. Reply with JSON only: {"headline":"max 6 words","say":"the exact line to say","ask":"a short comeback if they resist","caution":"a compliance watch-out only if there is a real risk, else empty string"}. Never promise coverage, claim payment, savings or price, and never suggest misstating anything on an application.';
 const NOTES_SYS='You write CRM call notes for a commercial P&C insurance agent from a machine transcript and call stats. Plain text, these sections: Summary (2-3 sentences); Prospect details captured (bullets); Objections and how they were handled; Missing information to collect; Next steps (with dates only if stated); Follow-up email the agent can send (short, friendly, aimed at booking a live call to review or bind). Do not invent facts; write "not captured" for unknowns. Agency rule: the email must never include quote amounts, attach a quote, or compare prices in writing; quotes are reviewed live. It must not promise coverage or pricing.';
 async function claude(system,user,max,temperature){
   if(useManus()){
@@ -1246,7 +1246,7 @@ async function maybeAI(reason,card){
     const out=await claude(COACH_SYS,user,300);let o;
     try{o=JSON.parse((out.match(/\{[\s\S]*\}/)||[''])[0]);}catch(e){o={headline:'',say:out};}
     $('#aiHead').textContent=o.headline||'';$('#aiSay').textContent=o.say||'';
-    $('#aiAsk').textContent=o.ask?'Ask: '+o.ask:'';$('#aiCaution').textContent=o.caution?'Watch out: '+o.caution:'';
+    $('#aiAsk').textContent=o.ask?'If they push back: '+o.ask:'';$('#aiCaution').textContent=o.caution?'Watch out: '+o.caution:'';
     $('#aiState').textContent='updated '+(S.t0?fmt(Date.now()-S.t0):'now');
   }catch(e){$('#aiState').textContent='';$('#aiHead').textContent='AI coach error';$('#aiSay').textContent=e.message;}
   finally{S.aiBusy=false;}
@@ -1300,19 +1300,20 @@ setDlg.addEventListener('close',()=>{
 });
 
 /* ---------- Quick objection section: Claude writes 3 pointers for the exact objection ---------- */
-const QUICK_SYS='You are a top-producing commercial P&C insurance agent coaching a teammate who is on a live sales call right now. They typed the objection the prospect just said. Give them three lines they can say out loud in the next few seconds to beat the objection and close.\n'+
-'How the lines must sound:\n'+
-'- Assertive, confident, persuasive and friendly: a closer, not a coverage textbook. Short sentences, contractions, plain words. Max 25 words each.\n'+
-'- Always push the sale forward. Use assumptive and either/or closes ("Do you want it to start on the 1st or today?", "Is now or 3 o\'clock better?"). Every set must end by asking for the sale or a hard next step with a specific time.\n'+
-'- AGENCY RULE: we never email, text or send quotes, proposals or written price comparisons, because prospects shop them with other agents. Quotes are presented live, on this call or at a set time today or tomorrow, and we close on that call. Never suggest sending our numbers in writing. If the prospect asks for the quote in writing, steer to going over it live right now. Asking the prospect to share their current dec page, loss runs or a competitor\'s quote is fine.\n'+
-'- All three pointers must address this objection, as the prospect put it. No generic sales advice and no other objections.\n'+
-'- Do not explain coverage, forms, endorsements or exclusions unless the objection is about coverage; then one plain-English sentence and back to closing.\n'+
-'- No canned phrases ("I understand your concern", "Great question", "I hear you"). Urgency only from real deadlines (the quote\'s expiration, their renewal date); never invent deadlines or scarcity.\n'+
-'- Never promise coverage, claim payment, savings or a price ("If I can beat it, are you ready to move today?" is fine; "I\'ll save you money" is not). Never suggest misstating application facts or sharing another client\'s details. Never invent statistics, testimonials or client stories. If they ask not to be called, respect it.\n'+
-'Pointer 1 "Disarm": agree with something real and pivot hard to the next step. Pointer 2 "Dig deeper": one question that exposes what is really holding them back or isolates the objection ("If we solve that, are we doing business today?"). Pointer 3 "Close": ask for the sale or a specific next step with a time.\n'+
-'Example of the style (do not reuse these words). Objection: "Just email me the quote." 1) Disarm: "I don\'t email quotes. A number without the details doesn\'t tell you anything. Give me five minutes and I\'ll walk you through it now." 2) Dig deeper: "If the number beats what you\'re paying, is there anything stopping you from moving today?" 3) Close: "Do you have five minutes right now, or is 3 o\'clock better?"\n'+
+const QUICK_SYS='You are a top-producing commercial P&C insurance closer coaching a teammate who is on a live sales call right now. They typed the objection the prospect just said. Give them three lines to say out loud in the next few seconds that beat the objection and close.\n'+
+'Energy: every line is a close. Direct, confident, upbeat, in control. No explaining, no "because" justifications, no coverage lectures. Short sentences, contractions, plain words, max 25 words.\n'+
+'Every line must end with a question that asks for a decision or a time, ideally an either/or ("Is now good, or is 3 o\'clock better?", "Do you want it to start today or on the 1st?"). Every set must end by asking for the sale.\n'+
+'This is the exact energy the agent wants for all three lines: "Let\'s review it together now and make a decision while we\'re on the phone. Is now better, or should we talk at 3 o\'clock?"\n'+
+'The three lines, each a different closing angle on this objection:\n'+
+'1 "Flip it": turn the objection into the reason to decide now, then ask for the decision.\n'+
+'2 "Isolate": take the objection off the table and ask for the sale ("If we handle that, are we good to go today?").\n'+
+'3 "Hard close": an assumptive either/or close with a specific time or start date.\n'+
+'For each line also give "pushback": a short comeback (max 15 words) if they resist, still closing.\n'+
+'AGENCY RULE: we never email, text or send quotes, proposals or written price comparisons, because prospects shop them with other agents. Quotes are presented live, on this call or at a set time today or tomorrow, and closed on that call. If they ask for the quote in writing, steer to going over it live right now. Asking the prospect for their dec page, loss runs or a competitor\'s quote is fine.\n'+
+'All three lines must address this objection, as the prospect put it. Mention coverage only if the objection is about coverage, in a few plain words, then close.\n'+
+'Limits: no canned phrases ("I understand your concern", "Great question", "I hear you"). Urgency only from real deadlines (the quote\'s expiration, their renewal date); never invent deadlines or scarcity. Never promise coverage, claim payment, savings or a price ("If I beat what you\'re paying, are we starting today?" is fine; "I\'ll save you money" is not). Never suggest misstating application facts or sharing another client\'s details. Never invent statistics, testimonials or client stories. If they ask not to be called, respect it.\n'+
 'Use the agent\'s own past replies when they fit; they show how this agent talks. Use context details (business type, coverage, dates, carrier, price) to make the lines specific.\n'+
-'Reply with JSON only: {"pointers":[{"title":"Disarm | Dig deeper | Close","say":"the exact line to say","ask":"one short follow-up or closing question, or empty string"}],"read":"one short sentence on why they are really saying this","caution":"one short compliance watch-out only if there is a real risk, else empty string"}';
+'Reply with JSON only: {"pointers":[{"title":"Flip it | Isolate | Hard close","say":"the exact line to say, ending with a closing question","pushback":"short comeback if they resist"}],"read":"one short sentence on why they are really saying this","caution":"one short compliance watch-out only if there is a real risk, else empty string"}';
 function bestCard(text){
   const t=norm(text);let best=null,len=0;
   for(const c of [...PLAYBOOK,...SIGNALS]){const m=matchCard(c,t);if(m&&m[0].trim().length>len){best=c;len=m[0].trim().length;}}
@@ -1322,10 +1323,10 @@ function localPointers(c){
   if(!c)return [];
   const exs=[...((L.examples||{})[c.id]||[])].sort((a,b)=>(OUT_RANK[b.outcome]??1)-(OUT_RANK[a.outcome]??1)||(b.t||0)-(a.t||0));
   const ps=[],sig=SIGNALS.includes(c);
-  if(c.say)ps.push({title:sig?'Lock it in':'Disarm',say:c.say});
-  if(c.ask)ps.push({title:sig?'Confirm':'Dig deeper',say:c.ask});
+  if(c.say)ps.push({title:sig?'Lock it in':'Flip it',say:c.say});
+  if(c.ask)ps.push({title:sig?'Confirm':'Isolate',say:c.ask});
   if(exs[0])ps.push({title:exs[0].outcome==='won'?'Worked before':'You said before',say:clip(exs[0].reply,220)});
-  else if(c.next)ps.push({title:'Close',say:c.next});
+  else if(c.next)ps.push({title:'Hard close',say:c.next});
   for(const ex of exs.slice(1))if(ps.length<3)ps.push({title:'You said before',say:clip(ex.reply,220)});
   return ps.slice(0,3);
 }
@@ -1334,7 +1335,7 @@ try{QH=JSON.parse(localStorage.getItem(QKEY)||'[]')||[];}catch(e){QH=[];}
 const saveQH=()=>{try{localStorage.setItem(QKEY,JSON.stringify(QH.slice(0,30)));}catch(e){}};
 let qSeq=0,qCur=null;
 const sayTxt=t=>{t=String(t||'').trim();return /^["“]/.test(t)?t:'“'+t+'”';};
-const cardHTML=ps=>ps.map((p,i)=>'<article class="qp"><span class="n">'+(i+1)+'</span><h3>'+esc(p.title||'')+'</h3><p class="qsay">'+esc(sayTxt(p.say))+'</p>'+(p.ask?'<p class="qask">Then ask: '+esc(p.ask)+'</p>':'')+'</article>').join('');
+const cardHTML=ps=>ps.map((p,i)=>'<article class="qp"><span class="n">'+(i+1)+'</span><h3>'+esc(p.title||'')+'</h3><p class="qsay">'+esc(sayTxt(p.say))+'</p>'+(p.pushback?'<p class="qask">If they push back: '+esc(p.pushback)+'</p>':p.ask?'<p class="qask">Then ask: '+esc(p.ask)+'</p>':'')+'</article>').join('');
 function showResult(r){
   $('#qOut').hidden=false;$('#qKey').hidden=true;
   $('#qRead').hidden=!r.read;$('#qRead').innerHTML=r.read?'<b>Why they\'re saying it:</b> '+esc(r.read):'';

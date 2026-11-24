@@ -1,5 +1,11 @@
 # Changelog
 
+## v16 — Nov 24, 2026
+- Every pointer is a close now: Flip it, Isolate, Hard close. Each line is direct, with no explaining, and ends with a question that asks for a decision or a time, usually an either/or.
+- Claude is anchored on the agent's favorite line: "Let's review it together now and make a decision while we're on the phone. Is now better, or should we talk at 3 o'clock?"
+- AI pointers add an "If they push back" comeback; the live coach does the same.
+- Every built-in talk track's main line rewritten to end with a closing question.
+
 ## v15 — Nov 24, 2026
 - Pushier: Claude's pointers and the live coach use assertive, assumptive and either/or closes, and every set ends by asking for the sale or a hard next step with a time.
 - Agency rule built in: never email, text or send quotes or written price comparisons. Quotes are presented live and closed on the call. Claude steers "just email me the quote" to a live walkthrough now or at a set time.
