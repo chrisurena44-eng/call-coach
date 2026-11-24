@@ -4,7 +4,7 @@ import os, json, asyncio
 from playwright.async_api import async_playwright
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL='file://'+os.path.join(ROOT,'index.html')
-SVC='https://callcoach-test.manus.space'
+SVC='https://callcoachai-jwnbgrgv.manus.space'  # built-in address; every request to it is mocked here
 def answer(tag):
     return json.dumps({"read":"They see the 3-year term as a reason not to look, not as a price problem.",
       "pointers":[{"title":f"Respect the term {tag}","say":"A three-year deal makes sense. Let's make sure you're ready before it ends.","ask":"When does the term end?"},
@@ -34,7 +34,8 @@ async def main():
         await pg.route(SVC+'/api/complete',manus)
         await pg.fill('#qText',"we're locked into a 3-year deal with our carrier")
         await pg.click('#qCtx summary'); await pg.fill('#qBiz','used car dealer'); await pg.select_option('#qCov','Surety / dealer bond'); await pg.fill('#qDet','renews in March')
-        await pg.fill('#qPassIn','test-passcode'); await pg.fill('#qUrlIn',SVC); await pg.click('#qKeySave'); await pg.wait_for_timeout(500)
+        assert not await pg.is_visible('#qUrlIn')  # address is built in
+        await pg.fill('#qPassIn','test-passcode'); await pg.click('#qKeySave'); await pg.wait_for_timeout(500)
         req=sent[0]; body=req['body']
         assert req['url']==SVC+'/api/complete' and 'x-api-key' not in req['headers']
         assert body['passcode']=='test-passcode' and body['temperature']==0.4 and body['model']=='haiku' and body['max_tokens']==700
@@ -55,7 +56,7 @@ async def main():
         src=await pg.text_content('#qSrc'); assert 'rejected the passcode' in src and await pg.is_visible('#qKey'), src
         print('BAD PASSCODE OK:',src)
         # Anthropic key fallback when no Manus passcode is saved
-        await pg.evaluate("localStorage.setItem('callcoach.cfg',JSON.stringify({antKey:'test-key',remember:true}))")
+        await pg.evaluate("localStorage.setItem('callcoach.cfg',JSON.stringify({antKey:'test-key',mPass:'',remember:true}))")
         async def anth(route):
             sent.append({'url':route.request.url,'headers':route.request.headers})
             await route.fulfill(status=200,content_type='application/json',body=json.dumps({"content":[{"type":"text","text":answer('A')}]}))

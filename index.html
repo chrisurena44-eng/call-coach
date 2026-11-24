@@ -718,15 +718,16 @@ const KEYTERMS=['bond','Sunbiz','dealer license','effective date','garage liabil
 <script>
 {
 const $=s=>document.querySelector(s);
-const APP_VERSION='11';
+const APP_VERSION='12';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL={me:'You',prospect:'Prospect',call:'Call'};
 const TAG={objection:'Objection',signal:'Buying signal',caution:'Careful',nudge:'Coaching'};
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-const MANUS_URL='';
+const MANUS_URL='https://callcoachai-jwnbgrgv.manus.space';
 const DEF={engine:'chrome',listen:'both',dgKey:'',antKey:'',mUrl:MANUS_URL,mPass:'',model:'claude-haiku-5-5',aiOn:false,remember:false,rcAnnounce:true,myName:'',qBiz:'',qCov:''};
 let cfg={...DEF};
 try{const saved=JSON.parse(localStorage.getItem('callcoach.cfg')||'null');if(saved)cfg={...DEF,...saved};}catch(e){}
+if(!cfg.mUrl)cfg.mUrl=MANUS_URL;
 function saveCfg(){try{const c={...cfg};if(!c.remember){c.dgKey='';c.antKey='';c.mPass='';}localStorage.setItem('callcoach.cfg',JSON.stringify(c));}catch(e){}}
 
 const norm=t=>' '+t.toLowerCase().replace(/[‘’]/g,"'").replace(/[^a-z0-9'$%&\s-]/g,' ').replace(/\s+/g,' ')+' ';
