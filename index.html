@@ -44,20 +44,41 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .ver{font:500 13px/1 Inter,sans-serif;color:var(--mute);vertical-align:middle;margin-left:4px}
 .upd{margin:12px max(3vw,14px) 0;padding:10px 10px 10px 16px;border-radius:12px;background:var(--blueSoft);display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
 .upd p{margin:0}
-.quick{margin:14px max(3vw,14px) 0;display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 10px 10px 16px}
-.quick label{font:600 16px "Space Grotesk",Inter,sans-serif;white-space:nowrap}
-.quick input{flex:1 1 260px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--bg)}
-.qres{margin:10px max(3vw,14px) 0;padding:16px;border-radius:14px;background:var(--card);border:1px solid var(--blue)}
-.qhead{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
-.qhead b{font-size:17px}
-.qhead span{margin-right:auto}
-.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;margin-top:12px}
+.tabs{display:flex;gap:4px;padding:6px max(3vw,14px) 0;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;color:var(--mute);font-weight:600;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current=page]{color:var(--ink);border-bottom-color:var(--pink)}
+.qview{display:grid;gap:16px;padding:16px max(3vw,14px) 32px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:1000px){.qview{grid-template-columns:minmax(0,1fr) 300px;align-items:start}}
+.qmain,.qside{background:var(--card);border:1px solid var(--line);border-radius:18px}
+.qmain{padding:clamp(18px,2.4vw,28px);display:grid;gap:14px}
+.qside{padding:18px}
+.qside h3{margin:0 0 10px;font-size:18px}
+.qh{margin:0;font-size:clamp(28px,3vw,38px);line-height:1.05}
+.qsub{margin:-6px 0 0}
+.qform{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+.qform textarea{flex:1 1 320px;min-height:64px;font-size:19px;line-height:1.35;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg);resize:vertical}
+.qform button{min-height:64px;padding:0 22px;font-size:17px}
+.qctx summary{font-size:15px}
+.qctx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px;margin-top:10px}
+.qctx-grid .wide{grid-column:1/-1}
+.qkey{border:1px solid var(--blue);background:var(--blueSoft);border-radius:14px;padding:16px;display:grid;gap:10px}
+.qkey p{margin:0}
+.qkey .row{display:flex;gap:8px;flex-wrap:wrap}
+.qkey input[type=password]{flex:1 1 260px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--card)}
+.qout{display:grid;gap:12px}
+.qread{margin:0;font-size:17px;padding:12px 14px;border-radius:12px;background:var(--bg)}
+.qmatch{margin:0}
+.qfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.skel{height:14px;border-radius:6px;background:var(--line);margin:10px 0;animation:pulse 1.2s infinite}
+@media(prefers-reduced-motion:reduce){.skel{animation:none}}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px}
 .qp{background:var(--bg);border-radius:12px;padding:14px 16px}
 .qp .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--blue);color:var(--card);font:600 14px Inter,sans-serif}
 .qp h3{margin:8px 0 6px;font-size:19px;line-height:1.2}
-.qp p{margin:0 0 6px;font-size:17px;line-height:1.4}
+.qp p{margin:0 0 8px;font-size:18px;line-height:1.4}
 .qp .qask{color:var(--mute);font-size:15px}
-.qcau{margin:10px 0 0;color:var(--amber);font-size:14px}
+.qcau{margin:0;color:var(--amber);font-size:15px}
 .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .timer{font:500 22px/1 "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;min-width:64px;text-align:right;white-space:nowrap}
 .notice{margin:12px max(3vw,14px) 0;padding:10px 10px 10px 16px;border-radius:12px;background:var(--amberSoft);display:flex;gap:12px;justify-content:space-between;align-items:center}
@@ -186,20 +207,11 @@ details ol{margin:8px 0 0;padding-left:20px}
   </div>
 </header>
 
-<form class="quick" id="quick" autocomplete="off">
-  <label for="qText">Quick objection</label>
-  <input id="qText" placeholder="Type what they said, e.g. &quot;we're locked into a 3-year deal&quot; (press / to jump here)">
-  <button class="primary">Get 3 pointers</button>
-</form>
-<section class="qres" id="qres" hidden aria-live="polite">
-  <div class="qhead"><b id="qTitle"></b><span class="small mute" id="qSrc"></span><button id="qClose" type="button">Close</button></div>
-  <p class="small" id="qMatch" style="margin:6px 0 0"></p>
-  <div class="qgrid" id="qGrid"></div>
-  <p class="qcau" id="qCau" hidden></p>
-</section>
+<nav class="tabs" aria-label="Sections"><a href="#live" id="tabLive">Live call</a><a href="#quick" id="tabQuick">Quick objection</a></nav>
 <div id="upd" class="upd" hidden><p>A new version of Call Coach is ready. Reload when you're between calls.</p><button id="updBtn" class="primary">Reload now</button></div>
 <div id="notice" class="notice" hidden><p id="noticeText"></p><button id="noticeX">Dismiss</button></div>
 
+<div id="viewLive">
 <main class="grid">
   <section class="cue" id="cue" data-kind="idle" aria-live="polite">
     <div class="cue-top"><span class="tag" id="cueTag">Ready</span><span class="small mute" id="cueTime"></span></div>
@@ -241,6 +253,46 @@ details ol{margin:8px 0 0;padding-left:20px}
     <ol class="history" id="history"></ol>
   </section>
 </main>
+</div>
+
+<section id="viewQuick" class="qview" hidden>
+  <div class="qmain">
+    <h2 class="qh">Quick objection</h2>
+    <p class="mute qsub">Type what the prospect said. Claude writes three pointers for that exact objection.</p>
+    <form id="qForm" class="qform" autocomplete="off">
+      <textarea id="qText" rows="2" aria-label="The objection" placeholder="e.g. We're locked into a 3-year deal with our carrier"></textarea>
+      <button class="primary" id="qGo">Get 3 pointers</button>
+    </form>
+    <details class="qctx" id="qCtx">
+      <summary>Add context for sharper pointers (optional)</summary>
+      <div class="qctx-grid">
+        <label class="field"><span class="small">Type of business</span><input id="qBiz" placeholder="e.g. used car dealer"></label>
+        <label class="field"><span class="small">Coverage</span><select id="qCov">
+          <option value="">Not specified</option><option>General liability</option><option>Garage liability / garagekeepers</option>
+          <option>Commercial auto</option><option>Workers' comp</option><option>BOP / property</option>
+          <option>Surety / dealer bond</option><option>Umbrella / excess</option><option>Surplus lines</option></select></label>
+        <label class="field wide"><span class="small">Details</span><input id="qDet" placeholder="e.g. renews in 30 days, paying $4,200 with their current carrier"></label>
+      </div>
+    </details>
+    <div class="qkey" id="qKey" hidden>
+      <p><b>Turn on AI pointers.</b> Quick objection uses Claude to write pointers for the exact objection. Paste your Anthropic API key (from console.anthropic.com, under API keys). Usage is billed by Anthropic, separately from your Claude plan.</p>
+      <div class="row"><input type="password" id="qKeyIn" autocomplete="off" aria-label="Anthropic API key" placeholder="sk-ant-..."><button class="primary" id="qKeySave" type="button">Save and get pointers</button></div>
+      <label class="opt small"><input type="checkbox" id="qKeyRemember" checked><span>Remember the key in this browser</span></label>
+    </div>
+    <div class="qout" id="qOut" hidden aria-live="polite">
+      <p class="qread" id="qRead"></p>
+      <p class="small mute qmatch" id="qMatch"></p>
+      <div class="qgrid" id="qGrid"></div>
+      <p class="qcau" id="qCau" hidden></p>
+      <div class="qfoot"><span class="small mute" id="qSrc"></span><button id="qMore" type="button">3 more ideas</button></div>
+    </div>
+  </div>
+  <aside class="qside">
+    <h3>Recent objections</h3>
+    <ol class="history" id="qRecent"></ol>
+    <p><button id="qClearRecent" type="button">Clear list</button></p>
+  </aside>
+</section>
 
 <dialog id="settings">
   <form method="dialog" class="dlg" id="setForm">
@@ -659,12 +711,12 @@ const KEYTERMS=['bond','Sunbiz','dealer license','effective date','garage liabil
 <script>
 {
 const $=s=>document.querySelector(s);
-const APP_VERSION='8';
+const APP_VERSION='9';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL={me:'You',prospect:'Prospect',call:'Call'};
 const TAG={objection:'Objection',signal:'Buying signal',caution:'Careful',nudge:'Coaching'};
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-const DEF={engine:'chrome',listen:'both',dgKey:'',antKey:'',model:'claude-haiku-5-5',aiOn:false,remember:false,rcAnnounce:true,myName:''};
+const DEF={engine:'chrome',listen:'both',dgKey:'',antKey:'',model:'claude-haiku-5-5',aiOn:false,remember:false,rcAnnounce:true,myName:'',qBiz:'',qCov:''};
 let cfg={...DEF};
 try{const saved=JSON.parse(localStorage.getItem('callcoach.cfg')||'null');if(saved)cfg={...DEF,...saved};}catch(e){}
 function saveCfg(){try{const c={...cfg};if(!c.remember){c.dgKey='';c.antKey='';}localStorage.setItem('callcoach.cfg',JSON.stringify(c));}catch(e){}}
@@ -1217,12 +1269,20 @@ setDlg.addEventListener('close',()=>{
   if(setDlg.returnValue!=='save')return;
   cfg={engine:setDlg.querySelector('input[name=engine]:checked')?.value||'chrome',listen:$('#listen').value,
     dgKey:$('#dgKey').value.trim(),antKey:$('#antKey').value.trim(),model:$('#model').value.trim()||DEF.model,
-    aiOn:$('#aiOn').checked,remember:$('#remember').checked,rcAnnounce:$('#rcAnnounce').checked,myName:cfg.myName||''};
+    aiOn:$('#aiOn').checked,remember:$('#remember').checked,rcAnnounce:$('#rcAnnounce').checked,myName:cfg.myName||'',qBiz:cfg.qBiz||'',qCov:cfg.qCov||''};
   saveCfg();applyDisclosure();if(!S.running&&S.cueKind==='idle')idleCue();else $('#aiBox').hidden=!aiReady();
 });
 
-/* ---------- quick objection: type it, get 3 pointers ---------- */
-const QUICK_SYS='You coach a commercial property and casualty insurance agent who is on a live sales call. The agent typed ONE objection the prospect just raised. All three pointers must answer that exact objection, as the prospect stated it. Do not address other objections, and do not give generic sales tips. Pointer 1: acknowledge the objection and reframe it. Pointer 2: a question that uncovers what is really behind this objection. Pointer 3: a concrete next step that moves past this objection. Reply with JSON only: {"pointers":[{"title":"2-5 words naming the approach","say":"one sentence the agent can say right now about this objection, max 28 words, plain-spoken","ask":"one follow-up question about this objection, max 16 words"}],"caution":"one compliance or E&O watch-out about this objection, or empty string"}. Use the playbook notes and the agent\'s past replies only if they are about this same objection. Use the call transcript only for details that relate to this objection. Never promise coverage, claim payment, or a price before underwriting; never suggest misstating application facts or sharing another client\'s details.';
+/* ---------- Quick objection section: Claude writes 3 pointers for the exact objection ---------- */
+const QUICK_SYS='You coach a commercial property and casualty insurance agent during a live sales call. The agent typed one objection a prospect just raised. Write pointers that are specific to that exact objection and the details in it.\n'+
+'Rules:\n'+
+'- All three pointers must address this objection, as the prospect put it. No generic sales advice and no other objections.\n'+
+'- Be specific: use the prospect\'s own words and details (coverage line, carrier, term, price, bond, dates, type of business) and real commercial P&C knowledge where it applies (forms and endorsements, certificates and additional insureds, audits, loss runs, class codes, garagekeepers, hired and non-owned auto, surplus lines, surety and dealer bonds, premium financing).\n'+
+'- Pointer 1 acknowledges and reframes the objection. Pointer 2 is a question that uncovers what is behind it. Pointer 3 is a concrete next step that moves past it.\n'+
+'- "say" is what the agent says out loud: natural and plain-spoken, max 30 words. "ask" is one short follow-up question.\n'+
+'- Never promise coverage, claim payment, savings or a price before underwriting. Never suggest misstating application facts, pressure tactics, or sharing another client\'s details.\n'+
+'- Playbook notes and the agent\'s past replies are background: use them only if they fit, and do not copy them.\n'+
+'Reply with JSON only: {"read":"one sentence on what is most likely behind this objection","pointers":[{"title":"2-5 words","say":"...","ask":"..."}],"caution":"one specific compliance or E&O watch-out, or empty string"}';
 function bestCard(text){
   const t=norm(text);let best=null,len=0;
   for(const c of [...PLAYBOOK,...SIGNALS]){const m=matchCard(c,t);if(m&&m[0].trim().length>len){best=c;len=m[0].trim().length;}}
@@ -1239,46 +1299,99 @@ function localPointers(c){
   for(const ex of exs.slice(1))if(ps.length<3)ps.push({title:'What you said before',say:'"'+clip(ex.reply,220)+'"'});
   return ps.slice(0,3);
 }
-function renderQuick(text,ps,src,caution,card,emptyMsg){
-  $('#qres').hidden=false;$('#qTitle').textContent='"'+clip(text,90)+'"';$('#qSrc').textContent=src;
-  $('#qMatch').textContent=card?'Matched objection: '+card.title.replace(/^Buying signal: /,'Buying signal, ')+'':'No playbook card matches this objection yet.';
-  $('#qGrid').innerHTML=ps.length?ps.map((p,i)=>'<article class="qp"><span class="n">'+(i+1)+'</span><h3>'+esc(p.title||'')+'</h3><p>'+esc(p.say||'')+'</p>'+(p.ask?'<p class="qask">Ask: '+esc(p.ask)+'</p>':'')+'</article>').join('')
-    :'<p class="mute" style="margin:0">'+esc(emptyMsg||'')+'</p>';
-  $('#qCau').hidden=!caution;$('#qCau').textContent=caution?'Watch out: '+caution:'';
+const QKEY='callcoach.quick';let QH=[];
+try{QH=JSON.parse(localStorage.getItem(QKEY)||'[]')||[];}catch(e){QH=[];}
+const saveQH=()=>{try{localStorage.setItem(QKEY,JSON.stringify(QH.slice(0,30)));}catch(e){}};
+let qSeq=0,qCur=null;
+const cardHTML=ps=>ps.map((p,i)=>'<article class="qp"><span class="n">'+(i+1)+'</span><h3>'+esc(p.title||'')+'</h3><p>'+esc(p.say||'')+'</p>'+(p.ask?'<p class="qask">Ask: '+esc(p.ask)+'</p>':'')+'</article>').join('');
+function showResult(r){
+  $('#qOut').hidden=false;$('#qKey').hidden=true;
+  $('#qRead').hidden=!r.read;$('#qRead').innerHTML=r.read?'<b>What\'s likely going on:</b> '+esc(r.read):'';
+  $('#qMatch').textContent=r.card?'Playbook match: '+r.card:'';
+  $('#qGrid').innerHTML=cardHTML(r.pointers||[]);
+  $('#qCau').hidden=!r.caution;$('#qCau').textContent=r.caution?'Watch out: '+r.caution:'';
+  $('#qSrc').textContent=r.src||'';$('#qMore').hidden=!r.ai;
+}
+function showLoading(text){
+  $('#qOut').hidden=false;$('#qKey').hidden=true;$('#qRead').hidden=false;$('#qRead').innerHTML='<b>Claude is reading:</b> "'+esc(clip(text,120))+'"';
+  $('#qMatch').textContent='';$('#qCau').hidden=true;$('#qMore').hidden=true;$('#qSrc').textContent='Writing 3 pointers…';
+  $('#qGrid').innerHTML=[1,2,3].map(i=>'<article class="qp"><span class="n">'+i+'</span><div class="skel" style="width:55%"></div><div class="skel"></div><div class="skel" style="width:80%"></div></article>').join('');
+}
+function renderRecent(){
+  $('#qRecent').innerHTML=QH.length?QH.map((h,i)=>'<li><button data-i="'+i+'">'+esc(clip(h.text,70))+'<time>'+new Date(h.t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'</time></button></li>').join('')
+    :'<li class="small mute">Objections you look up will be listed here.</li>';
+  $('#qClearRecent').hidden=!QH.length;
+}
+function qContext(){return {biz:$('#qBiz').value.trim(),cov:$('#qCov').value,det:$('#qDet').value.trim()};}
+async function runQuick(text,more){
+  text=(text||'').trim();if(!text)return;
+  const card=bestCard(text),ctx=qContext();
+  if(!cfg.antKey){
+    $('#qKey').hidden=false;$('#qKeyIn').focus();
+    const local=localPointers(card);
+    if(local.length)showResult({pointers:local,card:card.title,caution:card.avoid,src:'From your playbook while AI is off.'});
+    else $('#qOut').hidden=true;
+    $('#qKey').hidden=false;
+    return;
+  }
+  const seq=++qSeq;showLoading(text);
+  if(!more){S.typed.push(text);}
+  const notes=card?'Playbook background for a similar objection ('+card.title+'): say "'+(card.say||'')+'"; ask "'+(card.ask||'')+'"; next "'+(card.next||'')+'"; avoid "'+(card.avoid||'')+'"':'';
+  const exs=card?((L.examples||{})[card.id]||[]).slice(0,3).map(x=>'- ['+x.outcome+'] "'+x.reply+'"').join('\n'):'';
+  const convo=S.lines.slice(-12).map(l=>LABEL[l.who]+': '+l.text).join('\n');
+  const parts=['The objection, exactly as typed: "'+text+'"'];
+  if(ctx.biz||ctx.cov||ctx.det)parts.push('Context from the agent:'+(ctx.biz?'\n- Type of business: '+ctx.biz:'')+(ctx.cov?'\n- Coverage being discussed: '+ctx.cov:'')+(ctx.det?'\n- Details: '+ctx.det:''));
+  if(notes)parts.push(notes);
+  if(exs)parts.push('What this agent has said to this kind of objection on real calls:\n'+exs);
+  if(convo)parts.push('Recent call transcript (background only):\n'+convo);
+  if(more&&qCur)parts.push('You already suggested these; give three clearly different pointers:\n'+qCur.pointers.map(p=>'- '+p.say).join('\n'));
+  try{
+    const out=await claude(QUICK_SYS,parts.join('\n\n'),700,more?0.8:0.4);if(seq!==qSeq)return;
+    const o=JSON.parse((out.match(/\{[\s\S]*\}/)||['{}'])[0]),ps=(o.pointers||[]).filter(p=>p&&p.say).slice(0,3);
+    if(!ps.length)throw new Error('Claude didn\'t return pointers. Try again.');
+    qCur={text,read:o.read||'',pointers:ps,caution:o.caution||'',card:card?card.title:'',ctx,t:Date.now(),ai:true,src:'Written by Claude for this objection'};
+    showResult(qCur);QH.unshift(qCur);saveQH();renderRecent();logQuick(text,ps[0],o.caution);
+  }catch(err){
+    if(seq!==qSeq)return;
+    const bad=/api.?key|auth|401|invalid x-api-key/i.test(err.message);
+    const local=localPointers(card);
+    showResult({pointers:local,card:card?card.title:'',caution:card&&card.avoid,src:(bad?'Your API key was rejected. Check it in Settings.':'Claude error: '+err.message)+(local.length?' Showing your playbook instead.':'')});
+    if(!local.length)$('#qGrid').innerHTML='<p class="mute" style="margin:0">No pointers yet. Try again in a moment.</p>';
+    if(bad)$('#qKey').hidden=false;
+  }
 }
 function logQuick(text,p,caution){
   if(!p)return;
-  S.hist.unshift({card:{id:'q'+Date.now(),title:'Typed: "'+clip(text,48)+'"',why:'You typed this objection.',say:p.say||'',ask:p.ask||'',avoid:caution||''},kind:'objection',quote:text,t:Date.now()});
+  S.hist.unshift({card:{id:'q'+Date.now(),title:'Typed: "'+clip(text,48)+'"',why:'You looked up this objection.',say:p.say||'',ask:p.ask||'',avoid:caution||''},kind:'objection',quote:text,t:Date.now()});
   renderHistory();
 }
-let qSeq=0;
-$('#quick').addEventListener('submit',async e=>{
-  e.preventDefault();const text=$('#qText').value.trim();if(!text)return;
-  const seq=++qSeq,card=bestCard(text),local=localPointers(card);
-  S.typed.push(text);
-  if(!cfg.antKey){
-    renderQuick(text,local,'From your playbook',card&&card.avoid,card,'Add an Anthropic API key in Settings to get pointers for objections that aren\'t in your playbook yet.');
-    logQuick(text,local[0],card&&card.avoid);return;
-  }
-  renderQuick(text,local,'Claude is thinking…',card&&card.avoid,card,'Claude is writing pointers for this objection…');
-  const notes=card?'Playbook notes for this objection ('+card.title+'):\n- Why they say it: '+(card.why||'')+'\n- Say: '+(card.say||'')+'\n- Ask: '+(card.ask||'')+'\n- Next step: '+(card.next||'')+'\n- Avoid: '+(card.avoid||''):'';
-  const exs=card?((L.examples||{})[card.id]||[]).slice(0,3).map(x=>'- ['+x.outcome+'] "'+x.reply+'"').join('\n'):'';
-  const convo=S.lines.slice(-12).map(l=>LABEL[l.who]+': '+l.text).join('\n');
-  const user='The objection, exactly as the agent typed it: "'+text+'"\n\n'+(notes?notes+'\n\n':'')+(exs?'What this agent has said to this same objection on real calls:\n'+exs+'\n\n':'')+(convo?'Recent call transcript (background only):\n'+convo:'No live transcript.');
-  try{
-    const out=await claude(QUICK_SYS,user,600,0.3);if(seq!==qSeq)return;
-    const o=JSON.parse((out.match(/\{[\s\S]*\}/)||['{}'])[0]),ps=(o.pointers||[]).slice(0,3);
-    if(!ps.length)throw new Error('no pointers came back');
-    renderQuick(text,ps,'From Claude',o.caution||'',card);logQuick(text,ps[0],o.caution);
-  }catch(err){if(seq!==qSeq)return;
-    renderQuick(text,local,'Claude error: '+err.message+(local.length?' · showing your playbook':''),card&&card.avoid,card,'Claude couldn\'t answer, and no playbook card matches this objection yet.');
-    logQuick(text,local[0],card&&card.avoid);}
-});
-$('#qClose').onclick=()=>{$('#qres').hidden=true;};
+$('#qForm').addEventListener('submit',e=>{e.preventDefault();runQuick($('#qText').value);});
+$('#qText').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();runQuick($('#qText').value);}});
+$('#qMore').onclick=()=>{if(qCur)runQuick(qCur.text,true);};
+$('#qKeySave').onclick=()=>{
+  const k=$('#qKeyIn').value.trim();if(!k){$('#qKeyIn').focus();return;}
+  cfg.antKey=k;cfg.remember=$('#qKeyRemember').checked;saveCfg();$('#qKeyIn').value='';$('#qKey').hidden=true;
+  if($('#qText').value.trim())runQuick($('#qText').value);
+};
+$('#qRecent').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const h=QH[+b.dataset.i];if(!h)return;
+  qCur=h;$('#qText').value=h.text;showResult({...h,src:'From your recent list · '+new Date(h.t).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})});});
+$('#qClearRecent').onclick=()=>{QH=[];saveQH();renderRecent();};
+for(const [id,k] of [['qBiz','qBiz'],['qCov','qCov']]){$('#'+id).value=cfg[k]||'';$('#'+id).addEventListener('change',()=>{cfg[k]=$('#'+id).value.trim();saveCfg();});}
+if(cfg.qBiz||cfg.qCov)$('#qCtx').open=true;
+renderRecent();
+
+/* ---------- sections: Live call / Quick objection ---------- */
+function route(){
+  const q=location.hash==='#quick';
+  $('#viewQuick').hidden=!q;$('#viewLive').hidden=q;
+  $('#tabQuick').setAttribute('aria-current',q?'page':'false');$('#tabLive').setAttribute('aria-current',q?'false':'page');
+  if(q)setTimeout(()=>$('#qText').focus(),0);
+}
+window.addEventListener('hashchange',route);route();
 document.addEventListener('keydown',e=>{
   const tag=document.activeElement&&document.activeElement.tagName;
-  if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(tag)&&!document.querySelector('dialog[open]')){e.preventDefault();$('#qText').focus();$('#qText').select();}
-  else if(e.key==='Escape'&&document.activeElement===$('#qText')){$('#qres').hidden=true;$('#qText').value='';}
+  if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(tag)&&!document.querySelector('dialog[open]')){
+    e.preventDefault();if(location.hash!=='#quick')location.hash='quick';else $('#qText').focus();}
 });
 
 /* ---------- practice ---------- */

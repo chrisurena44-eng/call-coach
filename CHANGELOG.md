@@ -1,5 +1,12 @@
 # Changelog
 
+## v9 — Nov 23, 2026
+- **Quick objection is its own section.** Switch between **Live call** and **Quick objection** with the tabs under the header, or press / anywhere.
+- Claude writes three pointers specific to the exact objection and its details: acknowledge and reframe, the question that uncovers what's behind it, and a concrete next step. A one-line read on what's likely going on comes first.
+- Optional context (type of business, coverage, details) makes the pointers sharper; business type and coverage are remembered.
+- **3 more ideas** asks Claude for three different pointers. **Recent objections** keeps your last 30 lookups in this browser.
+- If no API key is saved, the section asks for it right there; until then it shows the matching playbook card.
+
 ## v8 — Nov 23, 2026
 - Quick objection now stays on the objection you typed: it picks the single best-matching objection, shows "Matched objection", and all 3 pointers address it (acknowledge and reframe, find the real concern, set the next step or what worked before).
 - Every objection and buying signal has a new next-step line.
