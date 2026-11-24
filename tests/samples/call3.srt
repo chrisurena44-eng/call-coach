@@ -1,0 +1,15 @@
+1
+00:00:01,000 --> 00:00:04,000
+Chris Urena: Thanks for calling back, Tom.
+
+2
+00:00:04,500 --> 00:00:09,000
+Tom Reyes: Sure. I'm happy with my agent but the price is just too high.
+
+3
+00:00:09,500 --> 00:00:16,000
+Chris Urena: Totally fair. Let's look at what's driving the price before we touch limits. Is it the total premium or the payment schedule?
+
+4
+00:00:16,500 --> 00:00:19,000
+Tom Reyes: The down payment is too steep.
